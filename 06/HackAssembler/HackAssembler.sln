@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31112.23
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HackAssembler", "HackAssembler\HackAssembler.csproj", "{D7E1A050-EFCC-4843-A6B9-985AC93B355F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D7E1A050-EFCC-4843-A6B9-985AC93B355F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7E1A050-EFCC-4843-A6B9-985AC93B355F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7E1A050-EFCC-4843-A6B9-985AC93B355F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7E1A050-EFCC-4843-A6B9-985AC93B355F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1EF4966C-E340-4AAA-95A8-41672B730D3C}
+	EndGlobalSection
+EndGlobal
