@@ -7,21 +7,31 @@ namespace HackAssembler
     {
         static void Main(string[] args)
         {
-            StreamReader reader = args switch
+            string[] files = args switch
             {
-                string[] a when a.Length == 1 => new StreamReader(a[0]),
-                _ => null
+                string[] a when a.Length == 0 => Directory.GetFiles(Directory.GetCurrentDirectory(), "*.asm"),
+                string[] a when a.Length == 1 => args,
+                _ => new string[0]
             };
 
-            var parser = new Parser(reader);
-
-            while (parser.HasMoreLines)
+            foreach (var f in files)
             {
-                parser.Advance();
-            }
+                var assembler = new Assembler();                
+                var symbolTable = new SymbolTable();
 
-            Console.WriteLine("Done");
-            Console.ReadLine();
+                using (var symbolreader = new StreamReader(f))
+                    assembler.PopulateTableWithLabels(symbolreader, symbolTable);
+
+                var outputFileName = Path.Combine(Path.GetDirectoryName(f), Path.GetFileNameWithoutExtension(f) + ".hack");
+                using (var input = new StreamReader(f))
+                using (var output = new StreamWriter(outputFileName))
+                {
+                    Console.WriteLine("Reading {0}", Path.GetFullPath(f));
+                    assembler.Assemble(input, symbolTable, output);
+                    Console.WriteLine("Wrote {0}", Path.GetFullPath(outputFileName));
+                }
+            }
         }
+
     }
 }

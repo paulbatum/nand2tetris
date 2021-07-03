@@ -19,31 +19,36 @@ namespace HackAssembler
         }
 
         public bool HasMoreLines => !reader.EndOfStream;
+        public Instruction CurrentInstruction => current;
 
         public void Advance()
         {
-            var line = reader.ReadLine()
-                .Split("//")[0]
-                .Trim();
-
-            current = line switch
+            current = null;
+            while (current == null && HasMoreLines)
             {
-                string s when string.IsNullOrWhiteSpace(s) => null,
-                string s when s.StartsWith("(") => new Instruction { Type = InstructionType.L_INSTRUCTION, Symbol = s[1..^1] },
-                string s when s.StartsWith("@") => new Instruction { Type = InstructionType.A_INSTRUCTION, Symbol = s[1..] },
-                string s => cInstructionRegex.Match(s) switch
+                var line = reader.ReadLine()
+                    .Split("//")[0]
+                    .Trim();
+
+                current = line switch
                 {
-                    Match m when m.Success => new Instruction
+                    string s when string.IsNullOrWhiteSpace(s) => null,
+                    string s when s.StartsWith("(") => new Instruction { Type = InstructionType.L_INSTRUCTION, Symbol = s[1..^1] },
+                    string s when s.StartsWith("@") => new Instruction { Type = InstructionType.A_INSTRUCTION, Symbol = s[1..] },
+                    string s => cInstructionRegex.Match(s) switch
                     {
-                        Type = InstructionType.C_INSTRUCTION,
-                        Dest = m.Groups[1].Value,
-                        Comp = m.Groups[2].Value,
-                        Jump = m.Groups[3].Value
+                        Match m when m.Success => new Instruction
+                        {
+                            Type = InstructionType.C_INSTRUCTION,
+                            Dest = m.Groups[1].Value,
+                            Comp = m.Groups[2].Value,
+                            Jump = m.Groups[3].Value
+                        },
+                        _ => throw new Exception($"Failed to parse C-instruction: {s}")
                     },
-                    _ => throw new Exception($"Failed to parse C-instruction: {s}")
-                },
-                _ => throw new Exception($"Failed to parse line: {line}")
-            };
+                    _ => throw new Exception($"Failed to parse line: {line}")
+                };
+            }
 
         }
 

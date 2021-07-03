@@ -2,7 +2,7 @@
   "profiles": {
     "HackAssembler": {
       "commandName": "Project",
-      "commandLineArgs": "\"D:\\code\\nand2tetris\\projects\\06\\max\\Max.asm\""
+      "commandLineArgs": "\"D:\\code\\nand2tetris\\projects\\06\\pong\\Pong.asm\""
     }
   }
 }
