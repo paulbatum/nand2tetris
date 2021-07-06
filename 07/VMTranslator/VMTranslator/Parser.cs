@@ -30,8 +30,10 @@ namespace VMTranslator
                 {
                     string s when string.IsNullOrWhiteSpace(s) => null,
                     string s when s.StartsWith("push") => new Command { CommandType = CommandType.C_PUSH, Arg1 = s.Split(' ')[1], Arg2 = int.Parse(s.Split(' ')[2])},
-                    "add" => new Command { CommandType = CommandType.C_ARITHMETIC, Arg1 = "add" },
-                    _ => throw new Exception($"Failed to parse line: {line}")
+                    //"add" => new Command { CommandType = CommandType.C_ARITHMETIC, Arg1 = "add" },
+                    //"eq" => new Command { CommandType = CommandType.C_ARITHMETIC, Arg1 = "eq" },
+                    //"lt" => new Command { CommandType = CommandType.C_ARITHMETIC, Arg1 = "lt" },
+                    _ => new Command { CommandType = CommandType.C_ARITHMETIC, Arg1 = line },
                 };
             }
         }
