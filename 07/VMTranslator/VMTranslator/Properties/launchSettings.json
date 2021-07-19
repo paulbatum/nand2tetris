@@ -2,7 +2,7 @@
   "profiles": {
     "VMTranslator": {
       "commandName": "Project",
-      "commandLineArgs": "D:\\code\\nand2tetris\\projects\\07\\MemoryAccess\\PointerTest\\PointerTest.vm"
+      "commandLineArgs": "D:\\code\\nand2tetris\\projects\\07\\MemoryAccess\\StaticTest\\StaticTest.vm"
     }
   }
 }

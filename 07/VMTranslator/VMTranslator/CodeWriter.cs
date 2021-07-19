@@ -7,12 +7,14 @@ namespace VMTranslator
 {
     public class CodeWriter
     {
+        private string fileName;
         private StreamWriter writer;
-        private int labelCounter = 0;
+        private int labelCounter = 0;        
 
-        public CodeWriter(StreamWriter writer)
+        public CodeWriter(string fileName, StreamWriter writer)
         {
             this.writer = writer;
+            this.fileName = fileName;
         }
 
         public void WritePushPop(CommandType commandType, string segment, int index)
@@ -27,10 +29,16 @@ namespace VMTranslator
                         writer.WriteLine($"D=A");
                         WritePushD();
                     }
+                    else if (segment == "static")
+                    {
+                        writer.WriteLine($"@{fileName}.{index}");
+                        writer.WriteLine($"D=M");
+                        WritePushD();
+                    }
                     else
                     {
                         writer.WriteLine($"@{MapSegment(segment)}");
-                        var r1 = segment == "temp" || segment == "pointer" ? "A" : "M"; 
+                        var r1 = IsVirtualSegment(segment) ? "M" : "A";
                         writer.WriteLine($"D={r1}");
                         writer.WriteLine($"@{index}");
                         writer.WriteLine($"A=D+A");  // go to the target address                        
@@ -40,22 +48,31 @@ namespace VMTranslator
                     break;
                 case CommandType.C_POP:
                     writer.WriteLine($"// pop {segment} {index}");
-                    // todo - swap the order here so its more efficient
-                    WritePopD();
-                    writer.WriteLine("@R13"); // store the popped value in r13
-                    writer.WriteLine("M=D"); 
-                    writer.WriteLine($"@{MapSegment(segment)}"); // figure out the target address
-                    var r2 = segment == "temp" || segment == "pointer" ? "A" : "M";
-                    writer.WriteLine($"D={r2}");
-                    writer.WriteLine($"@{index}");
-                    writer.WriteLine($"D=D+A");
-                    writer.WriteLine("@R14"); // save it in r14
-                    writer.WriteLine("M=D");
-                    writer.WriteLine("@R13"); // go back to r13 and load into D
-                    writer.WriteLine("D=M");
-                    writer.WriteLine("@R14"); // go the address saved in r14 and set it to D
-                    writer.WriteLine("A=M");
-                    writer.WriteLine("M=D");                    
+                    if (segment == "static")
+                    {
+                        WritePopD();
+                        writer.WriteLine($"@{fileName}.{index}");
+                        writer.WriteLine("M=D");
+                    }
+                    else
+                    {
+                        // todo - swap the order here so its more efficient
+                        WritePopD();
+                        writer.WriteLine("@R13"); // store the popped value in r13
+                        writer.WriteLine("M=D");
+                        writer.WriteLine($"@{MapSegment(segment)}"); // figure out the target address
+                        var r2 = IsVirtualSegment(segment) ? "M" : "A";
+                        writer.WriteLine($"D={r2}");
+                        writer.WriteLine($"@{index}");
+                        writer.WriteLine($"D=D+A");
+                        writer.WriteLine("@R14"); // save it in r14
+                        writer.WriteLine("M=D");
+                        writer.WriteLine("@R13"); // go back to r13 and load into D
+                        writer.WriteLine("D=M");
+                        writer.WriteLine("@R14"); // go the address saved in r14 and set it to D
+                        writer.WriteLine("A=M");
+                        writer.WriteLine("M=D");
+                    }
                     break;
                 default:
                     throw new ArgumentException($"Cannot push/pop command '{commandType}'.");
@@ -88,6 +105,20 @@ namespace VMTranslator
                     WriteDoubleOperandArithmetic(command);
                     break;
             }            
+        }
+
+        private bool IsVirtualSegment(string segment)
+        {
+            switch(segment)
+            {
+                case "local":
+                case "argument":
+                case "this":
+                case "that":
+                    return true;
+                default: 
+                    return false;
+            }
         }
 
         private string MapSegment(string segment)

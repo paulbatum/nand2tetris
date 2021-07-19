@@ -7,10 +7,10 @@ namespace VMTranslator
 {
     class Translator
     {
-        public void Translate(StreamReader input, StreamWriter output)
+        public void Translate(string fileName, StreamReader input, StreamWriter output)
         {
             var parser = new Parser(input);
-            var codeWriter = new CodeWriter(output);
+            var codeWriter = new CodeWriter(fileName, output);
 
             while (parser.HasMoreLines)
             {
