@@ -30,7 +30,7 @@ namespace VMTranslator
                     else
                     {
                         writer.WriteLine($"@{MapSegment(segment)}");
-                        var r1 = segment == "temp" ? "A" : "M"; 
+                        var r1 = segment == "temp" || segment == "pointer" ? "A" : "M"; 
                         writer.WriteLine($"D={r1}");
                         writer.WriteLine($"@{index}");
                         writer.WriteLine($"A=D+A");  // go to the target address                        
@@ -45,7 +45,7 @@ namespace VMTranslator
                     writer.WriteLine("@R13"); // store the popped value in r13
                     writer.WriteLine("M=D"); 
                     writer.WriteLine($"@{MapSegment(segment)}"); // figure out the target address
-                    var r2 = segment == "temp" ? "A" : "M";
+                    var r2 = segment == "temp" || segment == "pointer" ? "A" : "M";
                     writer.WriteLine($"D={r2}");
                     writer.WriteLine($"@{index}");
                     writer.WriteLine($"D=D+A");
@@ -97,7 +97,8 @@ namespace VMTranslator
                 "local" => "LCL",
                 "argument" => "ARG",
                 "this" => "THIS",
-                "that" => "THAT",                
+                "that" => "THAT", 
+                "pointer" => "THIS",
                 "temp" => "5",
                 _ => throw new ArgumentException($"Unknown segment to map: {segment}")
             };
