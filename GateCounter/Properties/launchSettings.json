@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "GateCounter": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\code\\nand2tetris\\01"
+    }
+  }
+}
