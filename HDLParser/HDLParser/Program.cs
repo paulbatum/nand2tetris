@@ -1,9 +1,48 @@
-﻿using Parlot.Fluent;
+﻿using Parlot;
+using Parlot.Fluent;
 using System.Text;
 using static Parlot.Fluent.Parsers;
 
-var input = File.ReadAllText(@"Not.hdl");
+var input = File.ReadAllText(@"Test.hdl");
 
+var scanner = new Scanner(input);
+
+while (true)
+{    
+    if (scanner.Cursor.Match("//"))
+    {
+        while (!Character.IsNewLine(scanner.Cursor.Current))
+            scanner.Cursor.Advance();
+        scanner.SkipWhiteSpaceOrNewLine();
+    }    
+    else if (scanner.Cursor.Match("/*"))
+    {        
+        while (!scanner.Cursor.Match("*/"))
+            scanner.Cursor.Advance();
+        scanner.Cursor.Advance();
+        scanner.Cursor.Advance();
+    }    
+    else if(Character.IsWhiteSpaceOrNewLine(scanner.Cursor.Current))
+    {
+        scanner.SkipWhiteSpaceOrNewLine();
+    }
+    else
+    {
+        break;
+    }
+}
+
+Console.WriteLine("SKIPPING:");
+Console.WriteLine(input.Substring(0, scanner.Cursor.Offset));
+Console.WriteLine();
+
+input = input.Substring(scanner.Cursor.Offset);
+
+Console.WriteLine("PROCESSING:");
+Console.WriteLine(input);
+
+Console.WriteLine("OUTPUT:");
+Console.WriteLine();
 
 var chip = Terms.Text("CHIP");
 
@@ -23,8 +62,7 @@ var pinAssignment = Terms.Identifier()
     .And(Terms.Identifier())
     .Then(x => new PinAssignment(new Pin(x.Item1.ToString()), new Pin(x.Item2.ToString())));
 
-var part = Terms.Identifier()
-    .AndSkip(Literals.WhiteSpace())
+var part = Terms.Identifier()    
     .And(Between(
         Terms.Char('('), 
         Separated(Terms.Char(','), pinAssignment), 
@@ -35,23 +73,26 @@ var part = Terms.Identifier()
 
 var parts = Terms.Text("PARTS:")
     .SkipAnd(Literals.WhiteSpace(includeNewLines:true))
-    .SkipAnd(OneOrMany(part));    
+    .SkipAnd(OneOrMany(part));
 
-var parser = chip
+var parser = OneOrMany(
+    chip
     .SkipAnd(Terms.Identifier())
     .AndSkip(Terms.Char('{'))
     .And(inputPins)
     .And(outputPins)
     .And(parts)
-    .Then(x => new Chip(x.Item1.ToString(), x.Item2, x.Item3, x.Item4));
+    .AndSkip(Terms.Char('}'))
+    .Then(x => new Chip(x.Item1.ToString(), x.Item2, x.Item3, x.Item4))
+    );
 
-var output = parser.Parse(input);
 
-//input = "Nand (a=in, b=in, out=out);";
-//input = "a=in";
-//var output = part.Parse(input);
+List<Chip> output = parser.Parse(input);
 
-Console.WriteLine(output);
+foreach(var c in output)
+{
+    Console.WriteLine(c);
+}
 
 public class Chip
 {
