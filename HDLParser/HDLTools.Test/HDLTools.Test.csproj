@@ -10,6 +10,9 @@
     <None Include="..\..\01\Not.hdl" Link="Not.hdl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+	  <None Include="..\..\01\Mux.hdl" Link="Mux.hdl">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
   </ItemGroup>
 
   <ItemGroup>

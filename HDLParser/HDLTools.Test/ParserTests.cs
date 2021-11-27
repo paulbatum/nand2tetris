@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -50,5 +51,26 @@ namespace HDLTools.Test
 
             Assert.Equal(2, output.Count);            
         }
+
+        [Theory]
+        [InlineData("Not.hdl")]
+        [InlineData("Mux.hdl")]
+        public void RoundTrip(string filename)
+        {            
+            var input = File.ReadAllText(filename);
+            input = HDLParser.SkipToChip(input);
+
+            static string DoReplacements(string inputString) => inputString
+                .Replace("    ", "\t")
+                .Replace(" (", "(")
+                .Replace(") ", ")")
+                .Replace("  ", " ");
+
+            List<ChipDescription> output = HDLParser.ParseString(input);
+            var outputText = output[0].ToString();
+
+            Assert.Equal(DoReplacements(input), DoReplacements(outputText));
+        }
+
     }
 }

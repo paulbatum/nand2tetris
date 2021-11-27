@@ -13,7 +13,7 @@ namespace HDLTools
 {
     public class HDLParser
     {
-        public static List<ChipDescription> ParseString(string input)
+        public static string SkipToChip(string input)
         {
             var scanner = new Scanner(input);
 
@@ -46,13 +46,12 @@ namespace HDLTools
             //Console.WriteLine(input.Substring(0, scanner.Cursor.Offset));
             //Console.WriteLine();
 
-            input = input.Substring(scanner.Cursor.Offset);
+            return input.Substring(scanner.Cursor.Offset);
+        }
 
-            //Console.WriteLine("PROCESSING:");
-            //Console.WriteLine(input);
-
-            //Console.WriteLine("OUTPUT:");
-            //Console.WriteLine();
+        public static List<ChipDescription> ParseString(string input)
+        {
+            input = SkipToChip(input);
 
             var chip = Terms.Text("CHIP");
 

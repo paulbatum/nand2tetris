@@ -28,21 +28,22 @@ namespace HDLTools
             builder.AppendLine($"CHIP {this.Name} {{");
 
             builder.Append("\tIN ");
-            builder.AppendLine(string.Join(',', InputPins.Select(x => x.Name)) + ";");
+            builder.AppendLine(string.Join(", ", InputPins.Select(x => x.Name)) + ";");
 
             builder.Append("\tOUT ");
-            builder.AppendLine(string.Join(',', OutputPins.Select(x => x.Name)) + ";");
+            builder.AppendLine(string.Join(", ", OutputPins.Select(x => x.Name)) + ";");
+            builder.AppendLine();
 
-            builder.AppendLine("\tPARTS:");
+            builder.AppendLine("\tPARTS:");            
             foreach (var part in Parts)
             {
                 builder.Append($"\t{part.Name} (");
-                builder.Append(string.Join(',', part.PinAssignments.Select(x => $"{x.Left.Name}={x.Right.Name}")));
+                builder.Append(string.Join(", ", part.PinAssignments.Select(x => $"{x.Left.Name}={x.Right.Name}")));
 
-                builder.AppendLine($")");
+                builder.AppendLine($");");
             }
 
-            builder.AppendLine("}");
+            builder.Append("}");
             return builder.ToString();
         }
     }
