@@ -12,6 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\HDLTools\HDLTools.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Mux.hdl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
