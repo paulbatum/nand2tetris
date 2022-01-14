@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,9 +10,14 @@ namespace HDLTools.Test
 {
     public class NotTests
     {
+        private class NotTestData : ComparisonTestData
+        {
+            public NotTestData() : base ("Not.cmp")
+            {}
+        }
+
         [Theory]
-        [InlineData(0, 1)]
-        [InlineData(1, 0)]
+        [ClassData(typeof(NotTestData))]
         public void BasicNot(int inValue, int outValue)
         {
             var library = new ChipLibrary();

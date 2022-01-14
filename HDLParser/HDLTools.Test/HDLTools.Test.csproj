@@ -10,10 +10,19 @@
     <None Include="..\..\01\Not.hdl" Link="Not.hdl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+	  <None Include="..\..\01\Not.cmp" Link="Not.cmp">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	  <None Include="..\..\01\Mux.hdl" Link="Mux.hdl">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
+	  <None Include="..\..\01\Mux.cmp" Link="Mux.cmp">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	  <None Include="..\..\01\And.hdl" Link="And.hdl">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Include="..\..\01\And.cmp" Link="And.cmp">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
 	  <None Include="..\..\01\Or.hdl" Link="Or.hdl">

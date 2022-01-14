@@ -9,11 +9,14 @@ namespace HDLTools.Test
 {
     public class MuxTests
     {
+        private class MuxTestData : ComparisonTestData
+        {
+            public MuxTestData() : base("Mux.cmp")
+            { }
+        }
+
         [Theory]
-        [InlineData(0, 0, 0, 0)]
-        [InlineData(1, 1, 1, 1)]
-        [InlineData(1, 1, 0, 1)]
-        [InlineData(0, 1, 1, 1)]
+        [ClassData(typeof(MuxTestData))]
         public void BasicMux(int a, int b, int sel, int outValue)
         {
             var library = new ChipLibrary();

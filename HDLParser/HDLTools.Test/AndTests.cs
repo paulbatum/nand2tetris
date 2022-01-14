@@ -11,6 +11,12 @@ namespace HDLTools.Test
 {
     public class AndTests
     {
+        private class AndTestData : ComparisonTestData
+        {
+            public AndTestData() : base("And.cmp")
+            { }
+        }
+
         private readonly ITestOutputHelper output;
         public AndTests(ITestOutputHelper output)
         {
@@ -18,10 +24,7 @@ namespace HDLTools.Test
         }
 
         [Theory]
-        [InlineData(0, 0, 0)]
-        [InlineData(1, 1, 1)]
-        [InlineData(0, 1, 0)]
-        [InlineData(1, 0, 0)]
+        [ClassData(typeof(AndTestData))]
         public void BasicAnd(int a, int b, int outValue)
         {
             var library = new ChipLibrary();
