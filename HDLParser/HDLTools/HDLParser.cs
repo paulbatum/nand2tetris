@@ -12,12 +12,20 @@ namespace HDLTools
 {
     public class HDLParser
     {
-        public static string SkipToChip(string input)
+        public static string RemoveComments(string input)
         {
             var scanner = new Scanner(input);
+            var builder = new StringBuilder();
 
-            while (true)
+            while (!scanner.Cursor.Eof)
             {
+                scanner.ReadWhile(c => c != '/', out TokenResult result);
+
+                if (result.Length > 0)
+                {
+                    builder.Append(result.GetText());
+                }
+
                 if (scanner.Cursor.Match("//"))
                 {
                     while (!Character.IsNewLine(scanner.Cursor.Current))
@@ -30,27 +38,15 @@ namespace HDLTools
                         scanner.Cursor.Advance();
                     scanner.Cursor.Advance();
                     scanner.Cursor.Advance();
-                }
-                else if (Character.IsWhiteSpaceOrNewLine(scanner.Cursor.Current))
-                {
-                    scanner.SkipWhiteSpaceOrNewLine();
-                }
-                else
-                {
-                    break;
-                }
+                }      
             }
 
-            //Console.WriteLine("SKIPPING:");
-            //Console.WriteLine(input.Substring(0, scanner.Cursor.Offset));
-            //Console.WriteLine();
-
-            return input.Substring(scanner.Cursor.Offset);
+            return builder.ToString().Trim();
         }
 
         public static List<ChipDescription> ParseString(string input)
         {
-            input = SkipToChip(input);
+            input = RemoveComments(input);
 
             var chip = Terms.Text("CHIP");
 

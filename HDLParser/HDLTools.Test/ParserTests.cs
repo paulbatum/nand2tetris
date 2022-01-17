@@ -58,7 +58,7 @@ namespace HDLTools.Test
         public void RoundTrip(string filename)
         {            
             var input = File.ReadAllText(filename);
-            input = HDLParser.SkipToChip(input);
+            input = HDLParser.RemoveComments(input);
 
             static string DoReplacements(string inputString) => inputString
                 .Replace("    ", "\t")
@@ -70,6 +70,63 @@ namespace HDLTools.Test
             var outputText = output[0].ToString();
 
             Assert.Equal(DoReplacements(input), DoReplacements(outputText));
+        }
+
+        [Fact]
+        public void IgnoresSingleLineComments()
+        {
+            var hdl =
+                @"CHIP Not {
+                    IN in;
+                    OUT out;
+
+                    PARTS:
+                    Nand (a=in, b=in, out=out);//Nand (a=in, b=in, out=out);
+                    //Nand (a=in, b=in, out=out);
+                }";
+
+            ChipDescription desc = HDLParser.ParseString(hdl).Single();
+            Assert.Single(desc.Parts);
+        }
+
+        [Fact]
+        public void IgnoresMultiLineComments()
+        {
+            var hdl =
+                @"CHIP Not {
+                    IN in;
+                    OUT out;
+
+                    PARTS:
+                    /*Nand (a=in, b=in, out=out);
+                    Nand (a=in, b=in, out=out);*/
+                    Nand (a=in, b=in, out=out);
+                }";
+
+            ChipDescription desc = HDLParser.ParseString(hdl).Single();
+            Assert.Single(desc.Parts);
+        }
+
+        [Fact]
+        public void HandlesMixOfComments()
+        {
+            var hdl =
+                @" // this is a comment
+                    CHIP Not {
+                    IN in;
+                    // IN in2;
+                    OUT out;
+
+                    PARTS:
+                    /*Nand (a=in, b=in, out=out);
+                    //Nand (a=in, b=in, out=out);
+                    * Nand (a=in, b=in, out=out);
+                    */
+                    Na/*asdf*/nd (a=in, b=in, out=out);
+                }";
+
+            ChipDescription desc = HDLParser.ParseString(hdl).Single();
+            Assert.Single(desc.Parts);
         }
 
     }
