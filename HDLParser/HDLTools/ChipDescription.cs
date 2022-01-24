@@ -38,7 +38,7 @@ namespace HDLTools
             foreach (var part in Parts)
             {
                 builder.Append($"\t{part.Name} (");
-                builder.Append(string.Join(", ", part.PinAssignments.Select(x => $"{x.Left.Name}={x.Right.Name}")));
+                builder.Append(string.Join(", ", part.PinAssignments.Select(x => $"{x.Left}={x.Right}")));
 
                 builder.AppendLine($");");
             }
@@ -47,7 +47,7 @@ namespace HDLTools
             return builder.ToString();
         }
     }
-    public record PinDescription(string Name);
-    public record PinAssignmentDescription(PinDescription Left, PinDescription Right);
+    public record PinDescription(string Name, int Width = 1);
+    public record PinAssignmentDescription(string Left, string Right, int LeftIndex = 0, int RightIndex = 0);
     public record PartDescription(string Name, List<PinAssignmentDescription> PinAssignments);
 }

@@ -50,21 +50,30 @@ namespace HDLTools
 
             var chip = Terms.Text("CHIP");
 
-            var pinList = Separated(Terms.Char(','), Terms.Identifier())
+                        
+            var indexer = 
+                    Terms.Char('[')
+                    .SkipAnd(Terms.Integer())
+                    .AndSkip(Terms.Char(']'));
+
+            var pin = Terms.Identifier()
+                .And(ZeroOrOne(indexer));
+
+            var pinList = Separated(Terms.Char(','), pin)
                 .AndSkip(Terms.Char(';'));
 
             var inputPins = Terms.Text("IN")
                 .SkipAnd(pinList)
-                .Then(x => x.Select(x => new PinDescription(x.ToString())).ToList());
+                .Then(x => x.Select(x => new PinDescription(Name: x.Item1.ToString(), Width: x.Item2 == 0 ? 1 : (int) x.Item2)).ToList());
 
             var outputPins = Terms.Text("OUT")
                 .SkipAnd(pinList)
-                .Then(x => x.Select(x => new PinDescription(x.ToString())).ToList());
+                .Then(x => x.Select(x => new PinDescription(Name: x.Item1.ToString(), Width: x.Item2 == 0 ? 1 : (int)x.Item2)).ToList());
 
-            var pinAssignment = Terms.Identifier()
+            var pinAssignment = pin
                 .AndSkip(Terms.Char('='))
-                .And(Terms.Identifier())
-                .Then(x => new PinAssignmentDescription(new PinDescription(x.Item1.ToString()), new PinDescription(x.Item2.ToString())));
+                .And(pin)
+                .Then(x => new PinAssignmentDescription(Left:x.Item1.ToString(), LeftIndex: (int) x.Item2, Right:x.Item3.Item1.ToString(), RightIndex: (int) x.Item3.Item2));
 
             var part = Terms.Identifier()
                 .And(Between(

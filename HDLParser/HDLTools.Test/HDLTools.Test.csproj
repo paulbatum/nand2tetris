@@ -19,6 +19,12 @@
 	  <None Include="..\..\01\Mux.cmp" Link="Mux.cmp">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
+	  <None Include="..\..\01\Mux16.hdl" Link="Mux16.hdl">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Include="..\..\01\Mux16.cmp" Link="Mux16.cmp">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	  <None Include="..\..\01\And.hdl" Link="And.hdl">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>

@@ -42,12 +42,12 @@ namespace HDLTools
 
                 foreach (PinAssignmentDescription pinAssignment in partDescription.PinAssignments)
                 {
-                    var leftPin = child.Pins.Single(x => x.Name == pinAssignment.Left.Name);
-                    var rightPin = this.Pins.SingleOrDefault(x => x.Name == pinAssignment.Right.Name);
+                    var leftPin = child.Pins.Single(x => x.Name == pinAssignment.Left);
+                    var rightPin = this.Pins.SingleOrDefault(x => x.Name == pinAssignment.Right);
 
                     if(rightPin == null)
                     {
-                        rightPin = new Pin(pinAssignment.Right.Name);
+                        rightPin = new Pin(pinAssignment.Right);
                         Pins.Add(rightPin);
                     }
 
