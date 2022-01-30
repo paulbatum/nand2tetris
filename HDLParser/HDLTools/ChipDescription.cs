@@ -28,17 +28,17 @@ namespace HDLTools
             builder.AppendLine($"CHIP {this.Name} {{");
 
             builder.Append("\tIN ");
-            builder.AppendLine(string.Join(", ", InputPins.Select(x => x.Name)) + ";");
+            builder.AppendLine(string.Join(", ", InputPins.Select(x => x.ToString())) + ";");
 
             builder.Append("\tOUT ");
-            builder.AppendLine(string.Join(", ", OutputPins.Select(x => x.Name)) + ";");
+            builder.AppendLine(string.Join(", ", OutputPins.Select(x => x.ToString())) + ";");
             builder.AppendLine();
 
             builder.AppendLine("\tPARTS:");            
             foreach (var part in Parts)
             {
                 builder.Append($"\t{part.Name} (");
-                builder.Append(string.Join(", ", part.PinAssignments.Select(x => $"{x.Left}={x.Right}")));
+                builder.Append(string.Join(", ", part.PinAssignments.Select(x => x.ToString())));
 
                 builder.AppendLine($");");
             }
@@ -47,7 +47,29 @@ namespace HDLTools
             return builder.ToString();
         }
     }
-    public record PinDescription(string Name, int Width = 1);
-    public record PinAssignmentDescription(string Left, string Right, int LeftIndex = 0, int RightIndex = 0);
+    public record PinDescription(string Name, int Width = 1)
+    {
+        public override string ToString()
+        {
+            return Width == 1 ? Name : $"{Name}[{Width}]";
+        }
+    }
+
+    public record PinReference(string Name, bool IsIndexed, int Index)
+    {
+        public override string ToString()
+        {
+            return IsIndexed ? $"{Name}[{Index}]" : Name;
+        }
+    }
+
+    public record PinAssignmentDescription(PinReference Left, PinReference Right)
+    {
+        public override string ToString()
+        {
+            return $"{Left}={Right}";
+        }
+    }
+
     public record PartDescription(string Name, List<PinAssignmentDescription> PinAssignments);
 }

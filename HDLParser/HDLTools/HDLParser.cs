@@ -38,7 +38,7 @@ namespace HDLTools
                         scanner.Cursor.Advance();
                     scanner.Cursor.Advance();
                     scanner.Cursor.Advance();
-                }      
+                }
             }
 
             return builder.ToString().Trim();
@@ -50,30 +50,33 @@ namespace HDLTools
 
             var chip = Terms.Text("CHIP");
 
-                        
-            var indexer = 
-                    Terms.Char('[')
-                    .SkipAnd(Terms.Integer())
-                    .AndSkip(Terms.Char(']'));
 
-            var pin = Terms.Identifier()
-                .And(ZeroOrOne(indexer));
+            var indexer = Between(Terms.Char('['), Terms.Integer(), Terms.Char(']'));
+
+            var unindexedPin = Terms.Identifier()
+                .Then(x => new PinReference(Name: x.ToString(), IsIndexed: false, -1));
+
+            var indexedPin = Terms.Identifier()
+                .And(indexer)
+                .Then(x => new PinReference(Name: x.Item1.ToString(), IsIndexed: true, (int)x.Item2));
+
+            var pin = indexedPin.Or(unindexedPin);
 
             var pinList = Separated(Terms.Char(','), pin)
                 .AndSkip(Terms.Char(';'));
 
             var inputPins = Terms.Text("IN")
                 .SkipAnd(pinList)
-                .Then(x => x.Select(x => new PinDescription(Name: x.Item1.ToString(), Width: x.Item2 == 0 ? 1 : (int) x.Item2)).ToList());
+                .Then(x => x.Select(pinref => new PinDescription(Name: pinref.Name, Width: pinref.IsIndexed ? pinref.Index : 1)).ToList());
 
             var outputPins = Terms.Text("OUT")
                 .SkipAnd(pinList)
-                .Then(x => x.Select(x => new PinDescription(Name: x.Item1.ToString(), Width: x.Item2 == 0 ? 1 : (int)x.Item2)).ToList());
+                .Then(x => x.Select(pinref => new PinDescription(Name: pinref.Name, Width: pinref.IsIndexed ? pinref.Index : 1)).ToList());
 
             var pinAssignment = pin
                 .AndSkip(Terms.Char('='))
                 .And(pin)
-                .Then(x => new PinAssignmentDescription(Left:x.Item1.ToString(), LeftIndex: (int) x.Item2, Right:x.Item3.Item1.ToString(), RightIndex: (int) x.Item3.Item2));
+                .Then(x => new PinAssignmentDescription(Left: x.Item1, Right: x.Item2));
 
             var part = Terms.Identifier()
                 .And(Between(
@@ -97,7 +100,7 @@ namespace HDLTools
                 .And(parts)
                 .AndSkip(Terms.Char('}'))
                 .Then(x => new ChipDescription(x.Item1.ToString(), x.Item2, x.Item3, x.Item4))
-                );
+            );
 
 
             List<ChipDescription> output = parser.Parse(input);

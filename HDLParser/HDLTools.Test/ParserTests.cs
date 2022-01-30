@@ -31,16 +31,16 @@ namespace HDLTools.Test
             Assert.Equal(3, part.PinAssignments.Count);
 
             var assignment0 = part.PinAssignments[0];
-            Assert.Equal("a", assignment0.Left);
-            Assert.Equal("in", assignment0.Right);
+            Assert.Equal("a", assignment0.Left.Name);
+            Assert.Equal("in", assignment0.Right.Name);
 
             var assignment1 = part.PinAssignments[1];
-            Assert.Equal("b", assignment1.Left);
-            Assert.Equal("in", assignment1.Right);
+            Assert.Equal("b", assignment1.Left.Name);
+            Assert.Equal("in", assignment1.Right.Name);
 
             var assignment2 = part.PinAssignments[2];
-            Assert.Equal("out", assignment2.Left);
-            Assert.Equal("out", assignment2.Right);
+            Assert.Equal("out", assignment2.Left.Name);
+            Assert.Equal("out", assignment2.Right.Name);
         }
 
         [Fact]
@@ -55,6 +55,7 @@ namespace HDLTools.Test
         [Theory]
         [InlineData("Not.hdl")]
         [InlineData("Mux.hdl")]
+        [InlineData("Mux16.hdl")]
         public void RoundTrip(string filename)
         {            
             var input = File.ReadAllText(filename);
@@ -176,28 +177,28 @@ namespace HDLTools.Test
 
             
             var assignment0 = mux.PinAssignments[0]; // a=b[7]
-            Assert.Equal("a", assignment0.Left);
-            Assert.Equal(0, assignment0.LeftIndex);
-            Assert.Equal("b", assignment0.Right);
-            Assert.Equal(7, assignment0.RightIndex);
+            Assert.Equal("a", assignment0.Left.Name);
+            Assert.False(assignment0.Left.IsIndexed);
+            Assert.Equal("b", assignment0.Right.Name);
+            Assert.Equal(7, assignment0.Right.Index);
 
             var assignment1 = mux.PinAssignments[1]; // b=a[7]
-            Assert.Equal("b", assignment1.Left);
-            Assert.Equal(0, assignment1.LeftIndex);
-            Assert.Equal("a", assignment1.Right);
-            Assert.Equal(7, assignment1.RightIndex);
+            Assert.Equal("b", assignment1.Left.Name);
+            Assert.False(assignment1.Left.IsIndexed);
+            Assert.Equal("a", assignment1.Right.Name);
+            Assert.Equal(7, assignment1.Right.Index);
 
             var assignment2 = mux.PinAssignments[2]; // sel=sel
-            Assert.Equal("sel", assignment2.Left);
-            Assert.Equal(0, assignment2.LeftIndex);
-            Assert.Equal("sel", assignment2.Right);
-            Assert.Equal(0, assignment2.RightIndex);
+            Assert.Equal("sel", assignment2.Left.Name);
+            Assert.False(assignment2.Left.IsIndexed);
+            Assert.Equal("sel", assignment2.Right.Name);
+            Assert.False(assignment2.Right.IsIndexed);
 
             var assignment3 = mux.PinAssignments[3]; // out=out[7]
-            Assert.Equal("out", assignment3.Left);
-            Assert.Equal(0, assignment3.LeftIndex);
-            Assert.Equal("out", assignment3.Right);
-            Assert.Equal(7, assignment3.RightIndex);
+            Assert.Equal("out", assignment3.Left.Name);
+            Assert.False(assignment3.Left.IsIndexed);
+            Assert.Equal("out", assignment3.Right.Name);
+            Assert.Equal(7, assignment3.Right.Index);
         }
     }
 }
