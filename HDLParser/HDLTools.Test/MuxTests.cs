@@ -9,7 +9,7 @@ namespace HDLTools.Test
 {
     public class MuxTests
     {
-        private class MuxTestData : ComparisonTestData
+        private class MuxTestData : BinaryTestData
         {
             public MuxTestData() : base("Mux.cmp")
             { }
@@ -34,13 +34,13 @@ namespace HDLTools.Test
             var pinB = chip.Pins.Single(x => x.Name == "b");
             var pinSel = chip.Pins.Single(x => x.Name == "sel");
             var pinOut = chip.Pins.Single(x => x.Name == "out");
-            pinA.Values[cycle] = a;
-            pinB.Values[cycle] = b;
-            pinSel.Values[cycle] = sel;
+            pinA.Init(a);
+            pinB.Init(b);
+            pinSel.Init(sel);
 
             chip.Simulate(cycle);
 
-            Assert.Equal(outValue, pinOut.GetValue(cycle));
+            Assert.Equal(outValue, pinOut.GetBit(cycle));
         }
     }
 }

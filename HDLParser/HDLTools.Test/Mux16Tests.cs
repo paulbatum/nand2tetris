@@ -11,7 +11,7 @@ namespace HDLTools.Test
 {
     public class Mux16Tests
     {
-        private class Mux16TestData : ComparisonTestData
+        private class Mux16TestData : BinaryTestData
         {
             public Mux16TestData() : base("Mux16.cmp")
             { }
@@ -23,9 +23,9 @@ namespace HDLTools.Test
             this.output = output;
         }
         
-        [Theory(Skip = "not ready yet")]
+        [Theory]
         [ClassData(typeof(Mux16TestData))]
-        public void BasicMux16(int[] a, int[] b, int[] outValue)
+        public void BasicMux16(int[] a, int[] b, int sel, int[] outValue)
         {
             var library = new ChipLibrary();
             library.Register(HDLParser.ParseString(File.ReadAllText("And.hdl")).Single());
@@ -41,15 +41,17 @@ namespace HDLTools.Test
             var cycle = 0;
             var pinA = chip.Pins.Single(x => x.Name == "a");
             var pinB = chip.Pins.Single(x => x.Name == "b");
+            var pinSel = chip.Pins.Single(x => x.Name == "sel");
             var pinOut = chip.Pins.Single(x => x.Name == "out");
-            //pinA.Values[cycle] = a;
-            //pinB.Values[cycle] = b;
+
+            pinA.Init(a);
+            pinB.Init(b);
+            pinSel.Init(sel);            
 
             chip.Simulate(cycle);
 
-            output.DumpChip(chip, cycle);
-
-            //Assert.Equal(outValue, pinOut.GetValue(cycle));
+            var output = pinOut.GetValue(cycle);
+            Assert.Equal(outValue, output);
         }
     }
 }

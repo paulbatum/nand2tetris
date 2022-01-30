@@ -10,7 +10,7 @@ namespace HDLTools.Test
 {
     public class NotTests
     {
-        private class NotTestData : ComparisonTestData
+        private class NotTestData : BinaryTestData
         {
             public NotTestData() : base ("Not.cmp")
             {}
@@ -29,11 +29,11 @@ namespace HDLTools.Test
             var cycle = 0;
             var inputPin = notChip.Pins.Single(x => x.Name == "in");
             var outputPin = notChip.Pins.Single(x => x.Name == "out");
-            inputPin.Values[cycle] = inValue;
+            inputPin.Init(inValue);
 
             notChip.Simulate(cycle);
 
-            Assert.Equal(outValue, outputPin.GetValue(cycle));
+            Assert.Equal(outValue, outputPin.GetBit(cycle));
         }
 
         [Theory]
@@ -62,11 +62,11 @@ namespace HDLTools.Test
             var cycle = 0;
             var inputPin = wrappedNotChip.Pins.Single(x => x.Name == "in");
             var outputPin = wrappedNotChip.Pins.Single(x => x.Name == "out");
-            inputPin.Values[cycle] = inValue;
+            inputPin.Init(inValue);
 
             wrappedNotChip.Simulate(cycle);
 
-            Assert.Equal(outValue, outputPin.GetValue(cycle));
+            Assert.Equal(outValue, outputPin.GetBit(cycle));
         }
 
         [Theory]
@@ -96,11 +96,11 @@ namespace HDLTools.Test
             var cycle = 0;
             var inputPin = doubleNotChip.Pins.Single(x => x.Name == "in");
             var outputPin = doubleNotChip.Pins.Single(x => x.Name == "out");
-            inputPin.Values[cycle] = inValue;
+            inputPin.Init(inValue);
 
             doubleNotChip.Simulate(cycle);
 
-            Assert.Equal(outValue, outputPin.GetValue(cycle));
+            Assert.Equal(outValue, outputPin.GetBit(cycle));
         }
     }
 }

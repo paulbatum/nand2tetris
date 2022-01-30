@@ -24,12 +24,12 @@ namespace HDLTools.Test
             var pinA = chip.Pins.Single(x => x.Name == "a");
             var pinB = chip.Pins.Single(x => x.Name == "b");
             var pinOut = chip.Pins.Single(x => x.Name == "out");
-            pinA.Values[cycle] = a;
-            pinB.Values[cycle] = b;
+            pinA.Init(a);
+            pinB.Init(b);
 
             chip.Simulate(cycle);
 
-            Assert.Equal(outValue, pinOut.GetValue(cycle));
+            Assert.Equal(outValue, pinOut.GetBit(cycle));
         }
     }
 }

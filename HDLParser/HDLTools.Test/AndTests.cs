@@ -11,7 +11,7 @@ namespace HDLTools.Test
 {
     public class AndTests
     {
-        private class AndTestData : ComparisonTestData
+        private class AndTestData : BinaryTestData
         {
             public AndTestData() : base("And.cmp")
             { }
@@ -39,14 +39,14 @@ namespace HDLTools.Test
             var pinA = chip.Pins.Single(x => x.Name == "a");
             var pinB = chip.Pins.Single(x => x.Name == "b");
             var pinOut = chip.Pins.Single(x => x.Name == "out");
-            pinA.Values[cycle] = a;
-            pinB.Values[cycle] = b;
+            pinA.Init(a);
+            pinB.Init(b);
 
             chip.Simulate(cycle);
 
             output.DumpChip(chip, cycle);
 
-            Assert.Equal(outValue, pinOut.GetValue(cycle));
+            Assert.Equal(outValue, pinOut.GetBit(cycle));
         }
     }
 }

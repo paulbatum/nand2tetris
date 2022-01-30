@@ -8,9 +8,9 @@ namespace HDLTools.Builtin
 {
     public class Nand : Chip
     {
-        private Pin pinA = new Pin("a");
-        private Pin pinB = new Pin("b");
-        private Pin pinOutput = new Pin("out") { IsOutput = true };
+        private Pin pinA = new Pin(new PinDescription("a"), isOutput: false);
+        private Pin pinB = new Pin(new PinDescription("b"), isOutput: false);
+        private Pin pinOutput = new Pin(new PinDescription("out"), isOutput: true);
 
         public Nand() : base("Nand")
         {            
@@ -23,8 +23,8 @@ namespace HDLTools.Builtin
         {
             var valueA = pinA.GetValue(cycle);
             var valueB = pinB.GetValue(cycle);
-            var result = valueA + valueB < 2 ? 1 : 0;
-            pinOutput.Values[cycle] = result;
+            var result = valueA[0] + valueB[0] < 2 ? 1 : 0;
+            pinOutput.SetBit(cycle, result);
         }
     }
 }

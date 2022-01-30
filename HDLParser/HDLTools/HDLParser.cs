@@ -54,7 +54,7 @@ namespace HDLTools
             var indexer = Between(Terms.Char('['), Terms.Integer(), Terms.Char(']'));
 
             var unindexedPin = Terms.Identifier()
-                .Then(x => new PinReference(Name: x.ToString(), IsIndexed: false, -1));
+                .Then(x => new PinReference(Name: x.ToString(), IsIndexed: false, 0));
 
             var indexedPin = Terms.Identifier()
                 .And(indexer)
