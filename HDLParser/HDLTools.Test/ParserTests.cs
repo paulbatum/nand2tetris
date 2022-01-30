@@ -13,7 +13,7 @@ namespace HDLTools.Test
         [Fact]
         public void ParsesNot()
         {
-            var input = File.ReadAllText("Not.hdl");
+            var input = File.ReadAllText(@"hdl\Not.hdl");
             List<ChipDescription> output = HDLParser.ParseString(input);
 
             var not = Assert.Single(output);
@@ -46,16 +46,35 @@ namespace HDLTools.Test
         [Fact]
         public void ParsesFileWithTwoChips()
         {
-            var input = File.ReadAllText("NotAndMux.hdl");
+            var input = @"
+                CHIP Not {
+                    IN in;
+                    OUT out;
+
+                    PARTS:
+                    Nand (a=in, b=in, out=out);
+                }
+
+                CHIP Mux {
+                    IN a, b, sel;
+                    OUT out;
+
+                    PARTS:
+                    Not(in=sel, out=notsel);
+                    And(a=a, b=notsel, out=aandsel);
+                    And(a=b, b=sel, out=bandsel);
+                    Or(a=aandsel, b=bandsel, out=out);
+                }";
+
             List<ChipDescription> output = HDLParser.ParseString(input);
 
             Assert.Equal(2, output.Count);            
         }
 
         [Theory]
-        [InlineData("Not.hdl")]
-        [InlineData("Mux.hdl")]
-        [InlineData("Mux16.hdl")]
+        [InlineData(@"hdl\Not.hdl")]
+        [InlineData(@"hdl\Mux.hdl")]
+        [InlineData(@"hdl\Mux16.hdl")]
         public void RoundTrip(string filename)
         {            
             var input = File.ReadAllText(filename);

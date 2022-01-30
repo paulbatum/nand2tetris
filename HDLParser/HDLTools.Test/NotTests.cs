@@ -21,7 +21,7 @@ namespace HDLTools.Test
         public void BasicNot(int inValue, int outValue)
         {
             var library = new ChipLibrary();
-            var notHDL = File.ReadAllText("Not.hdl");
+            var notHDL = File.ReadAllText(@"hdl\Not.hdl");
             ChipDescription notDescription = HDLParser.ParseString(notHDL).Single();
 
             Chip notChip = new Chip(notDescription, library);
@@ -42,7 +42,7 @@ namespace HDLTools.Test
         public void WrappedNot(int inValue, int outValue)
         {
             var library = new ChipLibrary();
-            var notHDL = File.ReadAllText("Not.hdl");
+            var notHDL = File.ReadAllText(@"hdl\Not.hdl");
             ChipDescription notDescription = HDLParser.ParseString(notHDL).Single();
             library.Register(notDescription);
 
@@ -75,7 +75,7 @@ namespace HDLTools.Test
         public void DoubleNot(int inValue, int outValue)
         {
             var library = new ChipLibrary();
-            var notHDL = File.ReadAllText("Not.hdl");
+            var notHDL = File.ReadAllText(@"hdl\Not.hdl");
             ChipDescription notDescription = HDLParser.ParseString(notHDL).Single();
             library.Register(notDescription);
 

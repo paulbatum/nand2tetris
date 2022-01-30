@@ -28,9 +28,9 @@ namespace HDLTools.Test
         public void BasicAnd(int a, int b, int outValue)
         {
             var library = new ChipLibrary();
-            library.Register(HDLParser.ParseString(File.ReadAllText("Not.hdl")).Single());
+            library.Register(HDLParser.ParseString(File.ReadAllText(@"hdl\Not.hdl")).Single());
 
-            var hdl = File.ReadAllText("And.hdl");
+            var hdl = File.ReadAllText(@"hdl\And.hdl");
             ChipDescription desc = HDLParser.ParseString(hdl).Single();
 
             Chip chip = new Chip(desc, library);

@@ -28,12 +28,12 @@ namespace HDLTools.Test
         public void BasicMux16(int[] a, int[] b, int sel, int[] outValue)
         {
             var library = new ChipLibrary();
-            library.Register(HDLParser.ParseString(File.ReadAllText("And.hdl")).Single());
-            library.Register(HDLParser.ParseString(File.ReadAllText("Or.hdl")).Single());
-            library.Register(HDLParser.ParseString(File.ReadAllText("Not.hdl")).Single());
-            library.Register(HDLParser.ParseString(File.ReadAllText("Mux.hdl")).Single());
+            library.Register(HDLParser.ParseString(File.ReadAllText(@"hdl\And.hdl")).Single());
+            library.Register(HDLParser.ParseString(File.ReadAllText(@"hdl\Or.hdl")).Single());
+            library.Register(HDLParser.ParseString(File.ReadAllText(@"hdl\Not.hdl")).Single());
+            library.Register(HDLParser.ParseString(File.ReadAllText(@"hdl\Mux.hdl")).Single());
 
-            var hdl = File.ReadAllText("Mux16.hdl");
+            var hdl = File.ReadAllText(@"hdl\Mux16.hdl");
             ChipDescription desc = HDLParser.ParseString(hdl).Single();
 
             Chip chip = new Chip(desc, library);

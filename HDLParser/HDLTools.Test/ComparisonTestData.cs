@@ -18,7 +18,7 @@ namespace HDLTools.Test
 
         public IEnumerator<object[]> GetEnumerator()
         {
-            var lines = File.ReadAllLines(comparisonFileName)
+            var lines = File.ReadAllLines(Path.Combine("cmp", comparisonFileName))
                 .Skip(1);
 
             foreach (var line in lines)
