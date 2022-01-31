@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace HDLTools.Test
+namespace HDLTools.Test.BuiltIn
 {
     public class Identity4Tests
     {

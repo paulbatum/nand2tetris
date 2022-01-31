@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace HDLTools.Test
+namespace HDLTools.Test.Chapter1
 {
     public class Or8WayTests
     {
