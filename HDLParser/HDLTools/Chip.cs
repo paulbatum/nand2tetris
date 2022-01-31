@@ -46,8 +46,10 @@ namespace HDLTools
 
                     if(rightPin == null)
                     {
-                        var intermediatePinDescription = new PinDescription(pinAssignment.Right.Name, 1);
-                        rightPin = new Pin(intermediatePinDescription, isOutput: false); // is isOutput always false here?
+                        // this logic is duplicated from the connection code.. need to consider a refactoring
+                        var internalPinSize = pinAssignment.Left.IsIndexed ? (pinAssignment.Left.EndIndex - pinAssignment.Left.StartIndex) + 1 : leftPin.Width;
+                        var internalPinDescription = new PinDescription(pinAssignment.Right.Name, internalPinSize);
+                        rightPin = new Pin(internalPinDescription, isOutput: false);
                         Pins.Add(rightPin);
                     }
 
@@ -114,7 +116,7 @@ namespace HDLTools
             var mySize = myReference.IsIndexed ? (myReference.EndIndex - myReference.StartIndex) + 1 : this.Width;
 
             if (targetSize != mySize)
-                throw new Exception($"Connection sizes don't match. Target size is '{targetSize}', my size is '{mySize}'.");
+                throw new Exception($"Connection sizes don't match. Target '{target.Name}' size is '{targetSize}', my '{myReference.Name}' size is '{mySize}'.");
 
             //if (targetIndexEnd > target.Width - 1)
             //    throw new Exception($"The index {targetIndexEnd} is out of range for target pin '{target.Name}' of width={target.Width}.");

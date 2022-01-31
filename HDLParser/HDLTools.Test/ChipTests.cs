@@ -203,5 +203,36 @@ namespace HDLTools.Test
             Assert.Equal(low2, pinLow2.GetValueString(cycle));
             Assert.Equal(high2, pinHigh2.GetValueString(cycle));
         }
+
+        [Theory]
+        [InlineData("0000", 1)]
+        [InlineData("0010", 1)]
+        [InlineData("0001", 1)]
+        [InlineData("0011", 0)]
+        [InlineData("1101", 1)]
+        public void OutputLeftInternal(string a, int outValue)
+        {
+            var hdl =
+                @"CHIP Test{
+                    IN a[4];
+                    OUT out;
+
+                    PARTS:
+                    Identity4 (in=a, out[0..1]=temp);
+                    Nand (a=temp[0], b=temp[1], out=out);
+                }";
+
+            var library = new ChipLibrary();
+            var chip = new Chip(HDLParser.ParseString(hdl).Single(), library);
+            var cycle = 0;
+
+            var pinA = chip.Pins.Single(x => x.Name == "a");
+            var outPin = chip.Pins.Single(x => x.Name == "out");
+
+            pinA.Init(a);
+
+            chip.Simulate(cycle);
+            Assert.Equal(outValue, outPin.GetBit(cycle));
+        }
     }
 }
