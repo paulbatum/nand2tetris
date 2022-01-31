@@ -5,11 +5,18 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace HDLTools.Test
 {
     public class ParserTests
     {
+        private readonly ITestOutputHelper testOutput;
+        public ParserTests(ITestOutputHelper output)
+        {
+            this.testOutput = output;
+        }
+
         [Fact]
         public void ParsesNot()
         {
@@ -75,6 +82,8 @@ namespace HDLTools.Test
         [InlineData(@"hdl\Not.hdl")]
         [InlineData(@"hdl\Mux.hdl")]
         [InlineData(@"hdl\Mux16.hdl")]
+        [InlineData(@"hdl\DMux4Way.hdl")]
+        [InlineData(@"hdl\DMux8Way.hdl")]
         public void RoundTrip(string filename)
         {            
             var input = File.ReadAllText(filename);
@@ -88,6 +97,9 @@ namespace HDLTools.Test
 
             List<ChipDescription> output = HDLParser.ParseString(input);
             var outputText = output[0].ToString();
+
+            testOutput.WriteLine(outputText);
+
 
             Assert.Equal(DoReplacements(input), DoReplacements(outputText));
         }
@@ -199,13 +211,13 @@ namespace HDLTools.Test
             Assert.Equal("a", assignment0.Left.Name);
             Assert.False(assignment0.Left.IsIndexed);
             Assert.Equal("b", assignment0.Right.Name);
-            Assert.Equal(7, assignment0.Right.Index);
+            Assert.Equal(7, assignment0.Right.StartIndex);
 
             var assignment1 = mux.PinAssignments[1]; // b=a[7]
             Assert.Equal("b", assignment1.Left.Name);
             Assert.False(assignment1.Left.IsIndexed);
             Assert.Equal("a", assignment1.Right.Name);
-            Assert.Equal(7, assignment1.Right.Index);
+            Assert.Equal(7, assignment1.Right.StartIndex);
 
             var assignment2 = mux.PinAssignments[2]; // sel=sel
             Assert.Equal("sel", assignment2.Left.Name);
@@ -217,7 +229,7 @@ namespace HDLTools.Test
             Assert.Equal("out", assignment3.Left.Name);
             Assert.False(assignment3.Left.IsIndexed);
             Assert.Equal("out", assignment3.Right.Name);
-            Assert.Equal(7, assignment3.Right.Index);
+            Assert.Equal(7, assignment3.Right.StartIndex);
         }
     }
 }

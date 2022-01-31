@@ -52,9 +52,9 @@ namespace HDLTools
                     }
 
                     if (leftPin.IsOutput)
-                        rightPin.AddConnection(leftPin, pinAssignment.Left.Index, pinAssignment.Right.Index);
+                        rightPin.AddConnection(leftPin, pinAssignment.Left.StartIndex, pinAssignment.Left.EndIndex, pinAssignment.Right.StartIndex, pinAssignment.Right.EndIndex);
                     else
-                        leftPin.AddConnection(rightPin, pinAssignment.Right.Index, pinAssignment.Left.Index);
+                        leftPin.AddConnection(rightPin, pinAssignment.Right.StartIndex, pinAssignment.Right.EndIndex, pinAssignment.Left.StartIndex, pinAssignment.Left.EndIndex);
                 }
                 parts.Add(child);
             }
@@ -75,7 +75,8 @@ namespace HDLTools
 
             foreach (var pin in Pins)
             {
-                builder.AppendLine($"{indent}{pin.Name}:{pin.GetValue(cycle)}");
+                var val = string.Join("", pin.GetValue(cycle));
+                builder.AppendLine($"{indent}{pin.Name}:{val}");
             }
 
             foreach (var part in parts)
@@ -104,18 +105,21 @@ namespace HDLTools
             this.Values = new Dictionary<int, int[]>();
         }        
 
-        public void AddConnection(Pin target, int targetIndex, int myIndex)
+        public void AddConnection(Pin target, int targetIndexStart, int targetIndexEnd, int myIndexStart, int myIndexEnd)
         {
             if (target == null)
                 throw new Exception("Cannot set a pin target to null");
 
-            if (targetIndex > target.Width - 1)
-                throw new Exception($"The index {targetIndex} is out of range for target pin {target.Name} of width={target.Width}.");
+            var targetSize = targetIndexEnd - targetIndexStart;
+            var mySize = myIndexEnd - myIndexStart;
 
-            if (this.connections.Any(x => x.Index == myIndex))
-                throw new Exception($"Why are we adding a connection for which there is already one?");
+            if (targetSize != mySize)
+                throw new Exception($"Connection sizes don't match. Target '{target.Name}' range is {targetIndexStart}..{targetIndexEnd} and self '{Name}' range is {myIndexStart}..{myIndexEnd}");
 
-            this.connections.Add(new Connection(target, targetIndex, myIndex));
+            if (targetIndexEnd > target.Width - 1)
+                throw new Exception($"The index {targetIndexEnd} is out of range for target pin '{target.Name}' of width={target.Width}.");
+
+            this.connections.Add(new Connection(target, targetIndexStart, targetIndexEnd, myIndexStart));
         }
 
         public int[] GetValue(int cycle)
@@ -131,7 +135,14 @@ namespace HDLTools
                 foreach(var c in connections)
                 {
                     var val = c.Target.GetValue(cycle);
-                    result[c.Index] = val[c.TargetIndex];
+                    // indexers are right to left, e.g. for sel=110, sel[2]=1, sel[1]=1, sel[0]=0
+                    // so we have to start from the right which is width - 1
+                    var myStartingPoint = this.Width - 1 - c.MyIndexStart;
+                    var targetStartingPoint = c.Target.Width - 1 - c.TargetIndexStart;
+                    for (int i = 0; i <= c.TargetIndexEnd - c.TargetIndexStart; i++)
+                    {
+                        result[myStartingPoint - i] = val[targetStartingPoint - i];
+                    }                    
                 }
                 
                 Values[cycle] = result;
@@ -167,18 +178,6 @@ namespace HDLTools
             this.Values[0] = values;
         }
 
-        private class Connection
-        {
-            public Pin Target { get; set; }
-            public int TargetIndex { get; set; }
-            public int Index { get; set; }
-
-            public Connection(Pin target, int targetIndex, int index)
-            {
-                this.Target = target;
-                this.TargetIndex = targetIndex;
-                this.Index = index;
-            }
-        }
+        private record Connection(Pin Target, int TargetIndexStart, int TargetIndexEnd, int MyIndexStart);        
     }
 }

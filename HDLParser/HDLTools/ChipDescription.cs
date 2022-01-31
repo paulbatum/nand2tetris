@@ -55,11 +55,16 @@ namespace HDLTools
         }
     }
 
-    public record PinReference(string Name, bool IsIndexed, int Index)
+    public record PinReference(string Name, bool IsIndexed, int StartIndex, int EndIndex)
     {
         public override string ToString()
         {
-            return IsIndexed ? $"{Name}[{Index}]" : Name;
+            if (IsIndexed)
+            {
+                return StartIndex == EndIndex ? $"{Name}[{StartIndex}]" : $"{Name}[{StartIndex}..{EndIndex}]";
+            }
+
+            return Name;
         }
     }
 
