@@ -17,10 +17,10 @@ namespace HDLTools.Test
             { }
         }
 
-        private readonly ITestOutputHelper output;
+        private readonly ITestOutputHelper testOutput;
         public Mux16Tests(ITestOutputHelper output)
         {
-            this.output = output;
+            this.testOutput = output;
         }
         
         [Theory]

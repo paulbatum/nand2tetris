@@ -17,10 +17,10 @@ namespace HDLTools.Test
             { }
         }
 
-        private readonly ITestOutputHelper output;
+        private readonly ITestOutputHelper testOutput;
         public AndTests(ITestOutputHelper output)
         {
-            this.output = output;
+            this.testOutput = output;
         }
 
         [Theory]
@@ -44,7 +44,7 @@ namespace HDLTools.Test
 
             chip.Simulate(cycle);
 
-            output.DumpChip(chip, cycle);
+            testOutput.DumpChip(chip, cycle);
 
             Assert.Equal(outValue, pinOut.GetBit(cycle));
         }

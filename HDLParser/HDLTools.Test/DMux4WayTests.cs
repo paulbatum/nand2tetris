@@ -16,10 +16,10 @@ namespace HDLTools.Test
             { }
         }
 
-        private readonly ITestOutputHelper output;
+        private readonly ITestOutputHelper testOutput;
         public DMux4WayTests(ITestOutputHelper output)
         {
-            this.output = output;
+            this.testOutput = output;
         }
 
         [Theory]
@@ -50,8 +50,8 @@ namespace HDLTools.Test
             chip.Simulate(cycle);
 
 
-            output.WriteLine($"OUTPUT a:{pinA.GetBit(cycle)}, b: {pinB.GetBit(cycle)}, c:{pinC.GetBit(cycle)}, d:{pinD.GetBit(cycle)}");
-            output.DumpChip(chip);
+            testOutput.WriteLine($"OUTPUT a:{pinA.GetBit(cycle)}, b: {pinB.GetBit(cycle)}, c:{pinC.GetBit(cycle)}, d:{pinD.GetBit(cycle)}");
+            testOutput.DumpChip(chip);
             
 
             Assert.Equal(a, pinA.GetBit(cycle));

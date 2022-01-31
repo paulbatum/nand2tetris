@@ -16,10 +16,10 @@ namespace HDLTools.Test
             { }
         }
 
-        private readonly ITestOutputHelper output;
+        private readonly ITestOutputHelper testOutput;
         public DMux8WayTests(ITestOutputHelper output)
         {
-            this.output = output;
+            this.testOutput = output;
         }
 
         [Theory]
