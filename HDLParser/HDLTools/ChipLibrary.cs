@@ -28,6 +28,9 @@ namespace HDLTools
             if (name == "Nand")
                 return new Nand();
 
+            if (name == "Identity4")
+                return new Identity4();
+
             if(descriptions.ContainsKey(name))
             {
                 return new Chip(descriptions[name], this);

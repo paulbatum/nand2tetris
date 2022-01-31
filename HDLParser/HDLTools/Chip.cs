@@ -52,9 +52,9 @@ namespace HDLTools
                     }
 
                     if (leftPin.IsOutput)
-                        rightPin.AddConnection(leftPin, pinAssignment.Left.StartIndex, pinAssignment.Left.EndIndex, pinAssignment.Right.StartIndex, pinAssignment.Right.EndIndex);
+                        rightPin.AddConnection(leftPin, pinAssignment.Left, pinAssignment.Right);
                     else
-                        leftPin.AddConnection(rightPin, pinAssignment.Right.StartIndex, pinAssignment.Right.EndIndex, pinAssignment.Left.StartIndex, pinAssignment.Left.EndIndex);
+                        leftPin.AddConnection(rightPin, pinAssignment.Right, pinAssignment.Left);
                 }
                 parts.Add(child);
             }
@@ -88,7 +88,7 @@ namespace HDLTools
 
     public class Pin
     {
-        private List<Connection> connections = new List<Connection> ();
+        private List<Connection> connections = new List<Connection>();
 
         public Dictionary<int, int[]> Values { get; private set; }
 
@@ -101,25 +101,30 @@ namespace HDLTools
             this.Name = description.Name;
             this.Width = description.Width;
             this.IsOutput = isOutput;
-            
-            this.Values = new Dictionary<int, int[]>();
-        }        
 
-        public void AddConnection(Pin target, int targetIndexStart, int targetIndexEnd, int myIndexStart, int myIndexEnd)
+            this.Values = new Dictionary<int, int[]>();
+        }
+
+        public void AddConnection(Pin target, PinReference targetReference, PinReference myReference)
         {
             if (target == null)
                 throw new Exception("Cannot set a pin target to null");
 
-            var targetSize = targetIndexEnd - targetIndexStart;
-            var mySize = myIndexEnd - myIndexStart;
+            var targetSize = targetReference.IsIndexed ? (targetReference.EndIndex - targetReference.StartIndex) + 1 : target.Width;
+            var mySize = myReference.IsIndexed ? (myReference.EndIndex - myReference.StartIndex) + 1 : this.Width;
 
             if (targetSize != mySize)
-                throw new Exception($"Connection sizes don't match. Target '{target.Name}' range is {targetIndexStart}..{targetIndexEnd} and self '{Name}' range is {myIndexStart}..{myIndexEnd}");
+                throw new Exception($"Connection sizes don't match. Target size is '{targetSize}', my size is '{mySize}'.");
 
-            if (targetIndexEnd > target.Width - 1)
-                throw new Exception($"The index {targetIndexEnd} is out of range for target pin '{target.Name}' of width={target.Width}.");
+            //if (targetIndexEnd > target.Width - 1)
+            //    throw new Exception($"The index {targetIndexEnd} is out of range for target pin '{target.Name}' of width={target.Width}.");
 
-            this.connections.Add(new Connection(target, targetIndexStart, targetIndexEnd, myIndexStart));
+            var connection = new Connection(target,
+                targetReference.IsIndexed ? targetReference.StartIndex : 0,
+                myReference.IsIndexed ? myReference.StartIndex : 0,
+                mySize);
+
+            this.connections.Add(connection);
         }
 
         public int[] GetValue(int cycle)
@@ -132,29 +137,24 @@ namespace HDLTools
             {
                 int[] result = new int[Width];
 
-                foreach(var c in connections)
-                {
-                    var val = c.Target.GetValue(cycle);
-                    // indexers are right to left, e.g. for sel=110, sel[2]=1, sel[1]=1, sel[0]=0
-                    // so we have to start from the right which is width - 1
-                    var myStartingPoint = this.Width - 1 - c.MyIndexStart;
-                    var targetStartingPoint = c.Target.Width - 1 - c.TargetIndexStart;
-                    for (int i = 0; i <= c.TargetIndexEnd - c.TargetIndexStart; i++)
-                    {
-                        result[myStartingPoint - i] = val[targetStartingPoint - i];
-                    }                    
-                }
-                
+                foreach (var c in connections)
+                    c.Apply(result, cycle);
+
                 Values[cycle] = result;
                 return result;
             }
-        }        
+        }
+
+        public void SetValue(int cycle, int[] values)
+        {
+            this.Values[cycle] = values;
+        }
 
         public int GetBit(int cycle)
         {
             var result = this.GetValue(cycle);
 
-            if(result.Length != 1)
+            if (result.Length != 1)
                 throw new Exception("GetBit only supported on pins with width=1");
 
             return result[0];
@@ -165,7 +165,7 @@ namespace HDLTools
             if (this.Width != 1)
                 throw new Exception("SetBit only supported on pins with width=1");
 
-            this.Values[cycle] = new[] { value };
+            SetValue(cycle, new[] { value });
         }
 
         public void Init(int value)
@@ -178,6 +178,22 @@ namespace HDLTools
             this.Values[0] = values;
         }
 
-        private record Connection(Pin Target, int TargetIndexStart, int TargetIndexEnd, int MyIndexStart);        
+        private record Connection(Pin Target, int TargetStartIndex, int MyStartIndex, int Width)
+        {
+            public void Apply(int[] myState, int cycle)
+            {
+                // indexers are right to left, e.g. for sel=110, sel[2]=1, sel[1]=1, sel[0]=0
+                // so we have to start from the right which is width - 1
+
+                var targetState = Target.GetValue(cycle);
+                var myStartingPoint = myState.Length - 1 - MyStartIndex;
+                var targetStartingPoint = targetState.Length - 1 - TargetStartIndex;
+
+                for (int i = 0; i < Width; i++)
+                {
+                    myState[myStartingPoint - i] = targetState[targetStartingPoint - i];
+                }
+            }
+        }
     }
 }

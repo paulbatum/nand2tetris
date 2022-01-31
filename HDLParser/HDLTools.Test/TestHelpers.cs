@@ -15,5 +15,29 @@ namespace HDLTools.Test
             chip.DumpTree(builder, cycle, "");
             output.WriteLine(builder.ToString());
         }
+
+        public static void Init(this Pin pin, string binaryString)
+        {
+            pin.Init(ConvertBinaryStringToIntArray(binaryString));
+        }
+
+        public static string GetValueString(this Pin pin, int cycle)
+        {
+            var val = pin.GetValue(cycle);
+            return ConvertIntArrayToBinaryString(val);
+        }
+
+        public static int[] ConvertBinaryStringToIntArray(string binaryString)
+        {
+            return binaryString
+                .ToCharArray()
+                .Select(c => int.Parse(c.ToString()))
+                .ToArray();
+        }
+
+        public static string ConvertIntArrayToBinaryString(int[] values)
+        {
+            return string.Join("", values.Select(x => x.ToString()));
+        }
     }
 }
