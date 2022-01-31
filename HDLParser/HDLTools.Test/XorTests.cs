@@ -9,28 +9,30 @@ using Xunit.Abstractions;
 
 namespace HDLTools.Test
 {
-    public class AndTests
+    public class XorTests
     {
         private class MyTestData : BinaryTestData
         {
-            public MyTestData() : base("And.cmp")
+            public MyTestData() : base("Xor.cmp")
             { }
         }
 
         private readonly ITestOutputHelper testOutput;
-        public AndTests(ITestOutputHelper output)
+        public XorTests(ITestOutputHelper output)
         {
             this.testOutput = output;
         }
 
         [Theory]
         [ClassData(typeof(MyTestData))]
-        public void BasicAnd(int a, int b, int outValue)
+        public void BasicXor(int a, int b, int outValue)
         {
             var library = new ChipLibrary();
             library.Register(HDLParser.ParseString(File.ReadAllText(@"hdl\Not.hdl")).Single());
+            library.Register(HDLParser.ParseString(File.ReadAllText(@"hdl\And.hdl")).Single());
+            library.Register(HDLParser.ParseString(File.ReadAllText(@"hdl\Or.hdl")).Single());
 
-            var hdl = File.ReadAllText(@"hdl\And.hdl");
+            var hdl = File.ReadAllText(@"hdl\Xor.hdl");
             ChipDescription desc = HDLParser.ParseString(hdl).Single();
 
             Chip chip = new Chip(desc, library);

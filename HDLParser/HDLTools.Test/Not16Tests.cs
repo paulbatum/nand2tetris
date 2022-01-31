@@ -9,44 +9,40 @@ using Xunit.Abstractions;
 
 namespace HDLTools.Test
 {
-    public class AndTests
+    public class Not16Tests
     {
         private class MyTestData : BinaryTestData
         {
-            public MyTestData() : base("And.cmp")
+            public MyTestData() : base("Not16.cmp")
             { }
         }
 
         private readonly ITestOutputHelper testOutput;
-        public AndTests(ITestOutputHelper output)
+        public Not16Tests(ITestOutputHelper output)
         {
             this.testOutput = output;
         }
 
         [Theory]
         [ClassData(typeof(MyTestData))]
-        public void BasicAnd(int a, int b, int outValue)
+        public void BasicNot16(int[] inValue, int[] outValue)
         {
             var library = new ChipLibrary();
-            library.Register(HDLParser.ParseString(File.ReadAllText(@"hdl\Not.hdl")).Single());
+            library.Register(HDLParser.ParseString(File.ReadAllText(@"hdl\Not.hdl")).Single());            
 
-            var hdl = File.ReadAllText(@"hdl\And.hdl");
+            var hdl = File.ReadAllText(@"hdl\Not16.hdl");
             ChipDescription desc = HDLParser.ParseString(hdl).Single();
 
             Chip chip = new Chip(desc, library);
 
             var cycle = 0;
-            var pinA = chip.Pins.Single(x => x.Name == "a");
-            var pinB = chip.Pins.Single(x => x.Name == "b");
+            var pinIn = chip.Pins.Single(x => x.Name == "in");            
             var pinOut = chip.Pins.Single(x => x.Name == "out");
-            pinA.Init(a);
-            pinB.Init(b);
+            pinIn.Init(inValue);
 
             chip.Simulate(cycle);
 
-            testOutput.DumpChip(chip, cycle);
-
-            Assert.Equal(outValue, pinOut.GetBit(cycle));
+            Assert.Equal(outValue, pinOut.GetValue(cycle));
         }
     }
 }
