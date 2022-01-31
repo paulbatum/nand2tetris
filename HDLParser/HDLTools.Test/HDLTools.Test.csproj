@@ -11,9 +11,19 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>
+	<ItemGroup>
+		<Content Include="..\..\02\*.hdl" Link="hdl\%(Filename)%(Extension)">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 
 	<ItemGroup>
 		<Content Include="..\..\01\*.cmp" Link="cmp\%(Filename)%(Extension)">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+	<ItemGroup>
+		<Content Include="..\..\02\*.cmp" Link="cmp\%(Filename)%(Extension)">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>

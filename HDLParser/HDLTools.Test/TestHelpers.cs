@@ -39,5 +39,18 @@ namespace HDLTools.Test
         {
             return string.Join("", values.Select(x => x.ToString()));
         }
+
+        public static void LoadAll(this ChipLibrary library, string hdlPath)
+        {
+            var hdlfiles = Directory.GetFiles(hdlPath, "*.hdl");
+            foreach (var hdlfile in hdlfiles)
+            {
+                var content = File.ReadAllText(hdlfile);
+                foreach(var chipDescription in HDLParser.ParseString(content))
+                {
+                    library.Register(chipDescription);
+                }
+            }
+        }
     }
 }
