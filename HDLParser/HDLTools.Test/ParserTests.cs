@@ -87,7 +87,7 @@ namespace HDLTools.Test
         public void RoundTrip(string filename)
         {            
             var input = File.ReadAllText(filename);
-            input = HDLParser.RemoveComments(input);
+            input = ParseHelpers.RemoveComments(input);
 
             static string DoReplacements(string inputString) => inputString
                 .Replace("    ", "\t")

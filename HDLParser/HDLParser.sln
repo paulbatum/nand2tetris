@@ -5,9 +5,11 @@ VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HDLParser", "HDLParser\HDLParser.csproj", "{258F5138-4A26-45B2-9D5E-F8109FD27341}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HDLTools", "HDLTools\HDLTools.csproj", "{A9A5B6EB-0FE3-4634-94CD-D2A0D6AED2FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HDLTools", "HDLTools\HDLTools.csproj", "{A9A5B6EB-0FE3-4634-94CD-D2A0D6AED2FC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HDLTools.Test", "HDLTools.Test\HDLTools.Test.csproj", "{A5B37516-21A3-43A1-B6F5-2416CA554303}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HDLTools.Test", "HDLTools.Test\HDLTools.Test.csproj", "{A5B37516-21A3-43A1-B6F5-2416CA554303}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestScriptRunner", "TestScriptRunner\TestScriptRunner.csproj", "{CD26EA3F-F420-426C-ACD7-6C0E07C3B33F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{A5B37516-21A3-43A1-B6F5-2416CA554303}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A5B37516-21A3-43A1-B6F5-2416CA554303}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A5B37516-21A3-43A1-B6F5-2416CA554303}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD26EA3F-F420-426C-ACD7-6C0E07C3B33F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD26EA3F-F420-426C-ACD7-6C0E07C3B33F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD26EA3F-F420-426C-ACD7-6C0E07C3B33F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD26EA3F-F420-426C-ACD7-6C0E07C3B33F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
