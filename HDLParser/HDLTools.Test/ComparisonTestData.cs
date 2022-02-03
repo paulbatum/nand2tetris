@@ -52,11 +52,7 @@ namespace HDLTools.Test
             {
                 if(inputString.Length > 1)
                 {
-                    outputs.Add(inputString
-                        .ToCharArray()
-                        .Select(c => int.Parse(c.ToString()))
-                        .ToArray()
-                    );
+                    outputs.Add(Conversions.ConvertBinaryStringToIntArray(inputString));
                 }
                 else
                 {

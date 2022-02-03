@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -11,6 +11,16 @@
     <ProjectReference Include="..\HDLTools\HDLTools.csproj" />
   </ItemGroup>
 
+	<ItemGroup>
+		<Content Include="..\..\01\*.hdl" Link="hdl\%(Filename)%(Extension)">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+	<ItemGroup>
+		<Content Include="..\..\01\*.cmp" Link="cmp\%(Filename)%(Extension)">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 	<ItemGroup>
 		<Content Include="..\..\01\*.tst" Link="tst\%(Filename)%(Extension)">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

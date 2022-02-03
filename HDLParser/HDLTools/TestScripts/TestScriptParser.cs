@@ -7,11 +7,11 @@ using Parlot;
 using Parlot.Fluent;
 using static Parlot.Fluent.Parsers;
 
-namespace HDLTools
+namespace HDLTools.TestScripts
 {
     public class TestScriptParser
     {
-        public static List<TestScriptCommand> ParseTestScriptString(string script)
+        public static List<TestScriptCommand> ParseString(string script)
         {
             script = ParseHelpers.RemoveComments(script);
 
@@ -118,26 +118,5 @@ namespace HDLTools
         }
     }
 
-    public record TestScriptCommand
-    {        
 
-    }
-
-    public record LoadCommand(string Filename) : TestScriptCommand;
-    public record OutputFileCommand(string Filename) : TestScriptCommand;
-    public record CompareToCommand(string Filename) : TestScriptCommand;
-    public record OutputListCommand(List<OutputSpec> OutputSpecs) : TestScriptCommand;
-    public record SetVariableCommand(string VariableName, VariableValue VariableValue) : TestScriptCommand;
-    public record EvalCommand() : TestScriptCommand;
-    public record OutputCommand() : TestScriptCommand;
-
-    public enum ValueFormat
-    {
-        Binary,
-        Decimal,
-        String,
-        Hex
-    }
-    public record OutputSpec(string VariableName, ValueFormat Format, int PadLeft, int Length, int PadRight);
-    public record VariableValue(int Value);
 }

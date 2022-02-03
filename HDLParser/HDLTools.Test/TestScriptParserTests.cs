@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HDLTools.TestScripts;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -37,7 +38,7 @@ namespace HDLTools.Test
         public async Task ParsesAndScript()
         {
             var script = await File.ReadAllTextAsync("tst/And.tst");
-            var commands = TestScriptParser.ParseTestScriptString(script);
+            var commands = TestScriptParser.ParseString(script);
 
             Assert.Equal(20, commands.Count);
 

@@ -26,5 +26,11 @@ namespace HDLTools.Builtin
             var result = valueA[0] + valueB[0] < 2 ? 1 : 0;
             pinOutput.SetBit(cycle, result);
         }
+
+        public override void Invalidate(int cycle)
+        {
+            foreach (var pin in this.Pins)
+                pin.Invalidate(cycle);
+        }
     }
 }

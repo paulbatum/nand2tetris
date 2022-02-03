@@ -70,6 +70,14 @@ namespace HDLTools
             }
         }
 
+        public virtual void Invalidate(int cycle)
+        {
+            foreach (var part in parts)
+            {
+                part.Invalidate(cycle);
+            }
+        }
+
         public void DumpTree(StringBuilder builder, int cycle, string indent)
         {
             builder.AppendLine($"{indent}{this.Name}:");
@@ -178,6 +186,11 @@ namespace HDLTools
         public void Init(int[] values)
         {
             this.Values[0] = values;
+        }
+
+        public void Invalidate(int cycle)
+        {
+            this.Values.Remove(cycle);
         }
 
         private record Connection(Pin Target, int TargetStartIndex, int MyStartIndex, int Width)
