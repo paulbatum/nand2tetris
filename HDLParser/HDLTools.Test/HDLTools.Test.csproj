@@ -28,6 +28,12 @@
 		</Content>
 	</ItemGroup>
 
+	<ItemGroup>
+		<Content Include="..\..\01\*.tst" Link="tst\%(Filename)%(Extension)">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
     <PackageReference Include="Parlot" Version="0.0.17" />

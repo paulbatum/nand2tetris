@@ -35,16 +35,16 @@ namespace HDLTools
                 .Then(x => (TestScriptCommand) new CompareToCommand(x.Item1 + x.Item2));
 
             var stringOutputFormat = Terms.Char('S')
-                .Then(x => OutputFormat.String);
+                .Then(x => ValueFormat.String);
 
             var decimalOutputFormat = Terms.Char('D')
-                .Then(x => OutputFormat.Decimal);
+                .Then(x => ValueFormat.Decimal);
 
             var binaryOutputFormat = Terms.Char('B')
-                .Then(x => OutputFormat.Binary);
+                .Then(x => ValueFormat.Binary);
 
             var hexOutputFormat = Terms.Char('X')
-                .Then(x => OutputFormat.Hex);
+                .Then(x => ValueFormat.Hex);
 
             var outputFormat = stringOutputFormat
                 .Or(decimalOutputFormat)
@@ -52,7 +52,7 @@ namespace HDLTools
                 .Or(hexOutputFormat);
 
             var outputSpecDefault = Terms.Identifier()
-                .Then(x => new OutputSpec(x.ToString(), OutputFormat.Binary, 1, 1, 1));
+                .Then(x => new OutputSpec(x.ToString(), ValueFormat.Binary, 1, 1, 1));
 
             var outputSpec = Terms.Identifier()
                 .AndSkip(Terms.Char('%'))
@@ -69,11 +69,49 @@ namespace HDLTools
                 .AndSkip(terminator)
                 .Then(x => (TestScriptCommand)new OutputListCommand(x));
 
+            var decimalVariableValue = Terms.Char('D')
+                .SkipAnd(Terms.Integer())
+                .Then(x => new VariableValue((int)x));
+
+            var binaryVariableValue = Terms.Char('B')
+                .SkipAnd(Terms.Pattern(c => c == '0' || c == '1', minSize: 1, maxSize: 16))
+                .Then(x => new VariableValue(Convert.ToInt32(x.ToString(), 2)));
+
+            var hexVariableValue = Terms.Char('X')
+                .SkipAnd(Terms.Pattern(c => "0123456789ABCDEF".Contains(c), minSize: 1, maxSize: 4))
+                .Then(x => new VariableValue(Convert.ToInt32(x.ToString(), 16)));
+
+            var defaultVariableValue = Terms.Integer()
+                .Then(x => new VariableValue((int)x));
+
+            var variableValue = hexVariableValue
+                .Or(binaryVariableValue)
+                .Or(decimalVariableValue)
+                .Or(defaultVariableValue);
+
+            var setVariable = Terms.Text("set")
+                .SkipAnd(Terms.Identifier())
+                .And(variableValue)
+                .AndSkip(terminator)
+                .Then(x => (TestScriptCommand) new SetVariableCommand(x.Item1.ToString(), x.Item2));
+
+            var eval = Terms.Text("eval")
+                .AndSkip(terminator)
+                .Then(x => (TestScriptCommand)new EvalCommand());
+
+            var output = Terms.Text("output")
+                .AndSkip(terminator)
+                .Then(x => (TestScriptCommand)new OutputCommand());
+
+
             var parser = OneOrMany(
                 load
                     .Or(outputFile)
                     .Or(compareTo)
                     .Or(outputList)
+                    .Or(setVariable)
+                    .Or(eval)
+                    .Or(output)
             );
 
             return parser.Parse(script).ToList();
@@ -89,14 +127,17 @@ namespace HDLTools
     public record OutputFileCommand(string Filename) : TestScriptCommand;
     public record CompareToCommand(string Filename) : TestScriptCommand;
     public record OutputListCommand(List<OutputSpec> OutputSpecs) : TestScriptCommand;
+    public record SetVariableCommand(string VariableName, VariableValue VariableValue) : TestScriptCommand;
+    public record EvalCommand() : TestScriptCommand;
+    public record OutputCommand() : TestScriptCommand;
 
-
-    public enum OutputFormat
+    public enum ValueFormat
     {
         Binary,
         Decimal,
         String,
         Hex
     }
-    public record OutputSpec(string VariableName, OutputFormat Format, int PadLeft, int Length, int PadRight);
+    public record OutputSpec(string VariableName, ValueFormat Format, int PadLeft, int Length, int PadRight);
+    public record VariableValue(int Value);
 }
