@@ -72,6 +72,11 @@ namespace HDLTools
 
         public virtual void Invalidate(int cycle)
         {
+            foreach(var pin in Pins)
+            {
+                pin.Invalidate(cycle);
+            }
+
             foreach (var part in parts)
             {
                 part.Invalidate(cycle);

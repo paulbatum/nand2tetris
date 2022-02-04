@@ -62,8 +62,7 @@ namespace HDLTools.TestScripts
                 case EvalCommand evalCommand:
                     if (chip == null)
                         throw new Exception("No chip loaded");
-
-                    chip.Invalidate(cycle);
+                    
                     chip.Simulate(cycle);
                     break;
                 case OutputCommand outputCommand:
@@ -109,6 +108,7 @@ namespace HDLTools.TestScripts
                     outputFile.WriteLine('|');
 
                     await outputFile.FlushAsync();
+                    chip.Invalidate(cycle);
                     // do the comparison logic later
                     break;
                 default:
