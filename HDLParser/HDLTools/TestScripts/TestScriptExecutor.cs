@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ namespace HDLTools.TestScripts
 {
     public class TestScriptExecutor
     {
+        private IFileSystem fs;
         private ChipLibrary chipLibrary;
         private List<TestScriptCommand> commands;
         private int current;
@@ -18,8 +20,9 @@ namespace HDLTools.TestScripts
         private OutputListCommand? outputList;
         private bool wroteHeader;
 
-        public TestScriptExecutor(ChipLibrary chipLibrary, List<TestScriptCommand> commands)
+        public TestScriptExecutor(IFileSystem fs, ChipLibrary chipLibrary, List<TestScriptCommand> commands)
         {
+            this.fs = fs;
             this.chipLibrary = chipLibrary;
             this.commands = commands;
             this.current = -1;
@@ -27,7 +30,7 @@ namespace HDLTools.TestScripts
         }
 
         public bool HasMoreLines => current < commands.Count - 1;
-        public Chip Chip => chip;
+        public Chip? Chip => chip;
 
         public void Step()
         {
@@ -44,10 +47,10 @@ namespace HDLTools.TestScripts
                     chip = chipLibrary.GetChip(chipDescription.Name, "");
                     break;
                 case OutputFileCommand outputFileCommand:
-                    outputFile = new StreamWriter(outputFileCommand.Filename);
+                    outputFile = new StreamWriter(fs.FileStream.Create(outputFileCommand.Filename, FileMode.Create));
                     break;
                 case CompareToCommand compareToCommand:
-                    compareFile = new StreamReader(Path.Combine("cmp",compareToCommand.Filename));
+                    compareFile = new StreamReader(fs.FileStream.Create(Path.Combine("cmp",compareToCommand.Filename), FileMode.Open));
                     break;
                 case OutputListCommand outputListCommand:
                     outputList = outputListCommand;
@@ -78,8 +81,7 @@ namespace HDLTools.TestScripts
 
                         foreach (var o in outputList.OutputSpecs)
                         {
-                            var headerText = o.VariableName.PadLeft(o.Length + o.PadLeft);
-                            headerText = headerText.PadRight(o.Length + o.PadLeft + o.PadRight);
+                            var headerText = OutputPadding.PadHeader(o);
                             outputFile.Write('|');
                             outputFile.Write(headerText);
                         }
@@ -100,15 +102,14 @@ namespace HDLTools.TestScripts
                         };
 
                         convertedOutputValue = convertedOutputValue.Substring(convertedOutputValue.Length - o.Length);
-                        convertedOutputValue = convertedOutputValue.PadLeft(convertedOutputValue.Length + o.PadLeft);
-                        convertedOutputValue = convertedOutputValue.PadRight(convertedOutputValue.Length + o.PadRight);
+                        convertedOutputValue = OutputPadding.PadValue(convertedOutputValue, o);
                         outputFile.Write('|');
                         outputFile.Write(convertedOutputValue);
                     }
                     outputFile.WriteLine('|');
 
                     outputFile.Flush();
-                    chip.Invalidate(cycle);
+                    chip.InvalidateOutputs(cycle);
                     // do the comparison logic later
                     break;
                 default:
@@ -116,6 +117,24 @@ namespace HDLTools.TestScripts
             }
 
 
+        }
+    }
+
+    public class OutputPadding
+    {
+        public static string PadHeader(OutputSpec o)
+        {
+            var paddingCount = o.Length + o.PadLeft + o.PadRight - o.VariableName.Length;
+            var padRight = Math.Max(o.PadRight, paddingCount - (paddingCount / 2));
+            var headerText = o.VariableName.PadRight(o.VariableName.Length + padRight);
+            return headerText.PadLeft(o.VariableName.Length + paddingCount);
+        }
+
+        public static string PadValue(string value, OutputSpec o)
+        {
+            value = value.PadLeft(value.Length + o.PadLeft);
+            value = value.PadRight(value.Length + o.PadRight);
+            return value;
         }
     }
 }

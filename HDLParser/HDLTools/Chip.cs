@@ -52,7 +52,7 @@ namespace HDLTools
                         // this logic is duplicated from the connection code.. need to consider a refactoring
                         var internalPinSize = pinAssignment.Left.IsIndexed ? (pinAssignment.Left.EndIndex - pinAssignment.Left.StartIndex) + 1 : leftPin.Width;
                         var internalPinDescription = new PinDescription(pinAssignment.Right.Name, internalPinSize);
-                        rightPin = new Pin(internalPinDescription, isOutput: false, this.FullyQualifiedName);
+                        rightPin = new Pin(internalPinDescription, isOutput: false, this.FullyQualifiedName, isInternal: true);
                         Pins.Add(rightPin);
                     }
 
@@ -73,16 +73,30 @@ namespace HDLTools
             }
         }
 
-        public virtual void Invalidate(int cycle)
+        public virtual void InvalidateOutputs(int cycle)
         {
             foreach(var pin in Pins)
+            {                
+                if(pin.IsOutput || pin.IsInternal)
+                    pin.Invalidate(cycle);
+            }
+
+            foreach (var part in parts)
+            {
+                part.InvalidateAll(cycle);
+            }
+        }
+
+        protected virtual void InvalidateAll(int cycle)
+        {
+            foreach (var pin in Pins)
             {
                 pin.Invalidate(cycle);
             }
 
             foreach (var part in parts)
             {
-                part.Invalidate(cycle);
+                part.InvalidateAll(cycle);
             }
         }
 
@@ -93,8 +107,8 @@ namespace HDLTools
 
             foreach (var pin in Pins)
             {
-                var val = string.Join("", pin.GetValue(cycle));
-                builder.AppendLine($"{indent}{pin.Name}:{val}");
+                var valueString = pin.Values.TryGetValue(cycle, out int[]? values) ? string.Join("", values) : "null";                
+                builder.AppendLine($"{indent}{pin.Name}:{valueString}");
             }
 
             foreach (var part in parts)
@@ -109,18 +123,19 @@ namespace HDLTools
         private List<Connection> connections = new List<Connection>();
 
         public Dictionary<int, int[]> Values { get; private set; }
-
+        public bool IsInternal { get; private set; }
         public bool IsOutput { get; private set; }
         public string Name { get; private set; }
         public string FullyQualifiedName { get; }
         public int Width { get; private set; }
 
-        public Pin(PinDescription description, bool isOutput, string fullyQualifiedParent)
+        public Pin(PinDescription description, bool isOutput, string fullyQualifiedParent, bool isInternal = false)
         {
             this.Name = description.Name;
             this.FullyQualifiedName = $"{fullyQualifiedParent}/{Name}";
             this.Width = description.Width;
             this.IsOutput = isOutput;
+            this.IsInternal = isInternal;
 
             this.Values = new Dictionary<int, int[]>();
         }

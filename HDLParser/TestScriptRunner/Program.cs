@@ -2,6 +2,7 @@
 using HDLTools.TestScripts;
 using Parlot;
 using Parlot.Fluent;
+using System.IO.Abstractions;
 using System.Text;
 using static Parlot.Fluent.Parsers;
 
@@ -25,7 +26,7 @@ foreach(var c in commands)
     Console.WriteLine(c);
 }
 
-var executor = new TestScriptExecutor(library, commands);
+var executor = new TestScriptExecutor(new FileSystem(), library, commands);
 
 while (executor.HasMoreLines)
 {

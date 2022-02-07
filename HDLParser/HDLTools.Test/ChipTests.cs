@@ -234,5 +234,47 @@ namespace HDLTools.Test
             chip.Simulate(cycle);
             Assert.Equal(outValue, outPin.GetBit(cycle));
         }
+
+        [Fact]
+        public void InvalidatePreservesExplicitInputPins()
+        {
+            var hdl =
+                @"CHIP And {
+                    IN a, b;
+                    OUT out;
+
+                    PARTS:
+                    Nand(a=a, b=b, out=nandab);
+                    Not(in=nandab, out=out);
+                }";
+
+            ChipDescription description = HDLParser.ParseString(hdl).Single();
+            var library = new ChipLibrary();
+            library.Register(HDLParser.ParseString(File.ReadAllText(@"hdl\Not.hdl")).Single());
+            var chip = new Chip(description, library);
+
+            var pinA = chip.Pins.Single(x => x.Name == "a");
+            var pinB = chip.Pins.Single(x => x.Name == "b");
+            var pinOut = chip.Pins.Single(x => x.Name == "out");
+            var cycle = 0;
+
+            pinA.Init(1);
+            pinB.Init(1);
+            chip.Simulate(cycle);            
+
+            Assert.Equal(1, pinOut.GetBit(cycle));
+
+            chip.InvalidateOutputs(cycle);
+            pinB.Init(0);
+            chip.Simulate(cycle);
+
+            Assert.Equal(0, pinOut.GetBit(cycle));
+
+            chip.InvalidateOutputs(cycle);
+            pinB.Init(1);
+            chip.Simulate(cycle);
+
+            Assert.Equal(1, pinOut.GetBit(cycle));
+        }
     }
 }

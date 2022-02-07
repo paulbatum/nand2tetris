@@ -34,10 +34,5 @@ namespace HDLTools.Builtin
             pinOutput.SetBit(cycle, result);
         }
 
-        public override void Invalidate(int cycle)
-        {
-            foreach (var pin in this.Pins)
-                pin.Invalidate(cycle);
-        }
     }
 }

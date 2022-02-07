@@ -21,10 +21,15 @@ namespace HDLTools
             return string.Join("", values.Select(x => x.ToString()));
         }
 
-        public static int[] ConvertDecimalIntToIntArray(int value, int length)
+        public static string ConvertDecimalIntToBinaryString(int value, int length)
         {
             var binaryString = Convert.ToString(value, 2);
-            binaryString = binaryString.PadLeft(length, '0');
+            return binaryString.PadLeft(length, '0');
+        }
+
+        public static int[] ConvertDecimalIntToIntArray(int value, int length)
+        {
+            var binaryString = ConvertDecimalIntToBinaryString(value, length);
             return ConvertBinaryStringToIntArray(binaryString);
         }
     }
