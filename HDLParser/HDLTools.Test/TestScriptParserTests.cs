@@ -78,5 +78,25 @@ namespace HDLTools.Test
             Assert.IsType<OutputCommand>(commands[19]);
         }
 
+        [Fact]
+        public void ParsesBinaryValues()
+        {
+            var script = @"set x %B0000000000000000,";
+            var commands = TestScriptParser.ParseString(script);
+
+            Assert.Single(commands);
+
+            AssertIsSetCommand(commands[0], "x", 0);
+        }
+
+        [Fact]
+        public async Task ParsesAluScript()
+        {
+            var script = await File.ReadAllTextAsync("tst/Alu.tst");
+            var commands = TestScriptParser.ParseString(script);
+
+            Assert.Equal(296, commands.Count);
+        }
+
     }
 }

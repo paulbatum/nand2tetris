@@ -18,17 +18,18 @@ namespace HDLTools.TestScripts
         private OutputListCommand? outputList;
         private bool wroteHeader;
 
-        public TestScriptExecutor(ChipLibrary chipLibrary, string script)
+        public TestScriptExecutor(ChipLibrary chipLibrary, List<TestScriptCommand> commands)
         {
             this.chipLibrary = chipLibrary;
-            this.commands = TestScriptParser.ParseString(script);
+            this.commands = commands;
             this.current = -1;
             this.cycle = 0;
         }
 
         public bool HasMoreLines => current < commands.Count - 1;
+        public Chip Chip => chip;
 
-        public async Task Step()
+        public void Step()
         {
             if (!HasMoreLines)
                 return;
@@ -39,8 +40,8 @@ namespace HDLTools.TestScripts
             switch (currentCommand)
             {
                 case LoadCommand loadCommand:
-                    var chipDescription = HDLParser.ParseString(await File.ReadAllTextAsync(Path.Combine("hdl", loadCommand.Filename))).Single();
-                    chip = chipLibrary.GetChip(chipDescription.Name);
+                    var chipDescription = HDLParser.ParseString(File.ReadAllText(Path.Combine("hdl", loadCommand.Filename))).Single();
+                    chip = chipLibrary.GetChip(chipDescription.Name, "");
                     break;
                 case OutputFileCommand outputFileCommand:
                     outputFile = new StreamWriter(outputFileCommand.Filename);
@@ -56,8 +57,7 @@ namespace HDLTools.TestScripts
                         throw new Exception("No chip loaded");
 
                     var targetPin = chip.Pins.Single(x => x.Name == setVariableCommand.VariableName);
-                    var stringRepresentation = Convert.ToString(setVariableCommand.VariableValue.Value, 2);
-                    targetPin.SetValue(cycle, Conversions.ConvertBinaryStringToIntArray(stringRepresentation));
+                    targetPin.SetValue(cycle, Conversions.ConvertDecimalIntToIntArray(setVariableCommand.VariableValue.Value, targetPin.Width));
                     break;
                 case EvalCommand evalCommand:
                     if (chip == null)
@@ -107,7 +107,7 @@ namespace HDLTools.TestScripts
                     }
                     outputFile.WriteLine('|');
 
-                    await outputFile.FlushAsync();
+                    outputFile.Flush();
                     chip.Invalidate(cycle);
                     // do the comparison logic later
                     break;

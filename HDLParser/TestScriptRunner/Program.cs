@@ -17,9 +17,17 @@ foreach (var hdlfile in hdlfiles)
     }
 }
 
-var executor = new TestScriptExecutor(library, File.ReadAllText(@"tst\And.tst"));
+var script = File.ReadAllText(@"tst\Alu.tst");
+var commands = TestScriptParser.ParseString(script);
+
+foreach(var c in commands)
+{
+    Console.WriteLine(c);
+}
+
+var executor = new TestScriptExecutor(library, commands);
 
 while (executor.HasMoreLines)
 {
-    await executor.Step();
+    executor.Step();
 }

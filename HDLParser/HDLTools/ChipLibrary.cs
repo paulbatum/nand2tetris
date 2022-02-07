@@ -23,17 +23,17 @@ namespace HDLTools
         }
 
 
-        public Chip GetChip(string name)
+        public Chip GetChip(string name, string fullyQualifiedParent)
         {
             if (name == "Nand")
-                return new Nand();
+                return new Nand(fullyQualifiedParent);
 
             if (name == "Identity4")
-                return new Identity4();
+                return new Identity4(fullyQualifiedParent);
 
             if(descriptions.ContainsKey(name))
             {
-                return new Chip(descriptions[name], this);
+                return new Chip(descriptions[name], this, fullyQualifiedParent);
             }
             else
             {

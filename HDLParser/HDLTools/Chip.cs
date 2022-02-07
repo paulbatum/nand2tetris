@@ -9,35 +9,38 @@ namespace HDLTools
 {
     public class Chip
     {
-        public string Name { get; set; }
+        public string Name { get; }
+        public string FullyQualifiedName { get; }
         
         public List<Pin> Pins = new List<Pin>();
         private List<Chip> parts = new List<Chip>();
 
-        protected Chip(string name)
+        protected Chip(string name, string fullyQualifiedParent)
         {
             this.Name = name;
+            this.FullyQualifiedName = $"{fullyQualifiedParent}/{name}";
         }
 
-        public Chip(ChipDescription chipDescription, ChipLibrary chipLibrary)
-        {
-            this.Name = chipDescription.Name;
+        public Chip(ChipDescription chipDescription, ChipLibrary chipLibrary) : this(chipDescription, chipLibrary, "")
+        { }
 
+        public Chip(ChipDescription chipDescription, ChipLibrary chipLibrary, string fullyQualifiedParent) : this(chipDescription.Name, fullyQualifiedParent)
+        {            
             foreach(var inputPinDescription in chipDescription.InputPins)
             {
-                var pin = new Pin(inputPinDescription, isOutput: false);
+                var pin = new Pin(inputPinDescription, isOutput: false, this.FullyQualifiedName);
                 Pins.Add(pin);
             }
 
             foreach (var outputPinDescription in chipDescription.OutputPins)
             {
-                var pin = new Pin(outputPinDescription, isOutput: true);
+                var pin = new Pin(outputPinDescription, isOutput: true, this.FullyQualifiedName);
                 Pins.Add(pin);
             }
 
             foreach (PartDescription partDescription in chipDescription.Parts)
             {                
-                var child = chipLibrary.GetChip(partDescription.Name);
+                var child = chipLibrary.GetChip(partDescription.Name, this.FullyQualifiedName);
 
                 foreach (PinAssignmentDescription pinAssignment in partDescription.PinAssignments)
                 {
@@ -49,7 +52,7 @@ namespace HDLTools
                         // this logic is duplicated from the connection code.. need to consider a refactoring
                         var internalPinSize = pinAssignment.Left.IsIndexed ? (pinAssignment.Left.EndIndex - pinAssignment.Left.StartIndex) + 1 : leftPin.Width;
                         var internalPinDescription = new PinDescription(pinAssignment.Right.Name, internalPinSize);
-                        rightPin = new Pin(internalPinDescription, isOutput: false);
+                        rightPin = new Pin(internalPinDescription, isOutput: false, this.FullyQualifiedName);
                         Pins.Add(rightPin);
                     }
 
@@ -109,11 +112,13 @@ namespace HDLTools
 
         public bool IsOutput { get; private set; }
         public string Name { get; private set; }
+        public string FullyQualifiedName { get; }
         public int Width { get; private set; }
 
-        public Pin(PinDescription description, bool isOutput)
+        public Pin(PinDescription description, bool isOutput, string fullyQualifiedParent)
         {
             this.Name = description.Name;
+            this.FullyQualifiedName = $"{fullyQualifiedParent}/{Name}";
             this.Width = description.Width;
             this.IsOutput = isOutput;
 
@@ -162,6 +167,9 @@ namespace HDLTools
 
         public void SetValue(int cycle, int[] values)
         {
+            if (values.Length != Width)
+                throw new Exception($"Value length mismatch on SetValue for chip '{this.FullyQualifiedName}' with width '{this.Width}', values has length {values.Length}");
+
             this.Values[cycle] = values;
         }
 

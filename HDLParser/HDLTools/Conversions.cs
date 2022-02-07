@@ -20,5 +20,12 @@ namespace HDLTools
         {
             return string.Join("", values.Select(x => x.ToString()));
         }
+
+        public static int[] ConvertDecimalIntToIntArray(int value, int length)
+        {
+            var binaryString = Convert.ToString(value, 2);
+            binaryString = binaryString.PadLeft(length, '0');
+            return ConvertBinaryStringToIntArray(binaryString);
+        }
     }
 }

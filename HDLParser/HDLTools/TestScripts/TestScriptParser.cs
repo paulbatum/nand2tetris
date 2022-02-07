@@ -69,15 +69,15 @@ namespace HDLTools.TestScripts
                 .AndSkip(terminator)
                 .Then(x => (TestScriptCommand)new OutputListCommand(x));
 
-            var decimalVariableValue = Terms.Char('D')
+            var decimalVariableValue = Terms.Text("%D")
                 .SkipAnd(Terms.Integer())
                 .Then(x => new VariableValue((int)x));
 
-            var binaryVariableValue = Terms.Char('B')
+            var binaryVariableValue = Terms.Text("%B")
                 .SkipAnd(Terms.Pattern(c => c == '0' || c == '1', minSize: 1, maxSize: 16))
                 .Then(x => new VariableValue(Convert.ToInt32(x.ToString(), 2)));
 
-            var hexVariableValue = Terms.Char('X')
+            var hexVariableValue = Terms.Text("%X")
                 .SkipAnd(Terms.Pattern(c => "0123456789ABCDEF".Contains(c), minSize: 1, maxSize: 4))
                 .Then(x => new VariableValue(Convert.ToInt32(x.ToString(), 16)));
 

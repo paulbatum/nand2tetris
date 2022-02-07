@@ -8,15 +8,22 @@ namespace HDLTools.Builtin
 {
     public class Nand : Chip
     {
-        private Pin pinA = new Pin(new PinDescription("a"), isOutput: false);
-        private Pin pinB = new Pin(new PinDescription("b"), isOutput: false);
-        private Pin pinOutput = new Pin(new PinDescription("out"), isOutput: true);
+        private Pin pinA;
+        private Pin pinB;
+        private Pin pinOutput;
 
-        public Nand() : base("Nand")
-        {            
+        public Nand() : this("")
+        { }
+
+        public Nand(string fullyQualifiedParent) : base("Nand", fullyQualifiedParent)
+        {
+            pinA = new Pin(new PinDescription("a"), isOutput: false, this.FullyQualifiedName);
+            pinB = new Pin(new PinDescription("b"), isOutput: false, this.FullyQualifiedName);
+            pinOutput = new Pin(new PinDescription("out"), isOutput: true, this.FullyQualifiedName);
+
             this.Pins.Add(pinA);
             this.Pins.Add(pinB);
-            this.Pins.Add(pinOutput);                        
+            this.Pins.Add(pinOutput);
         }
 
         public override void Simulate(int cycle)
