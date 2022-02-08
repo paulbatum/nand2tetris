@@ -16,7 +16,7 @@ namespace HDLTools.TestScripts
         private int cycle;
         private Chip? chip;
         private StreamWriter? outputFile;
-        private string[] compareFileLines;
+        private string[]? compareFileLines;
         private int currentCompareLine;
         private OutputListCommand? outputList;
         private bool wroteHeader;

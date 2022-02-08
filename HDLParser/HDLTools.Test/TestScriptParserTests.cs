@@ -98,5 +98,12 @@ namespace HDLTools.Test
             Assert.Equal(296, commands.Count);
         }
 
+        [Fact]
+        public void ThrowsOnParseFailure()
+        {
+            var script = "load And.hdl," + Environment.NewLine + "asdf";
+            Assert.Throws<InvalidTestScriptException>(() => TestScriptParser.ParseString(script));
+        }
+
     }
 }

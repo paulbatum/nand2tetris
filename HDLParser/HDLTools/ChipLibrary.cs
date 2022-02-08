@@ -31,6 +31,9 @@ namespace HDLTools
             if (name == "Identity4")
                 return new Identity4(fullyQualifiedParent);
 
+            if (name == "DFF")
+                return new DelayFlipFlop(fullyQualifiedParent);
+
             if(descriptions.ContainsKey(name))
             {
                 return new Chip(descriptions[name], this, fullyQualifiedParent);

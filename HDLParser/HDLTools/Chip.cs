@@ -162,7 +162,7 @@ namespace HDLTools
             this.connections.Add(connection);
         }
 
-        public int[] GetValue(int cycle)
+        public virtual int[] GetValue(int cycle)
         {
             if (Values.ContainsKey(cycle))
             {

@@ -112,9 +112,26 @@ namespace HDLTools.TestScripts
                     .Or(setVariable)
                     .Or(eval)
                     .Or(output)
-            );
+            ).Eof().ElseError("Expected EOF");
 
-            return parser.Parse(script).ToList();
+            if(parser.TryParse(script, out var commands, out ParseError error))
+            {
+                return commands;
+            }
+            else
+            {
+                throw new InvalidTestScriptException(error.Message, error.Position);
+            }
+
+        }
+    }
+
+    public class InvalidTestScriptException : Exception
+    {
+        public TextPosition Position { get; set; }
+        public InvalidTestScriptException(string? message, TextPosition position) : base(message)
+        {
+            this.Position = position;
         }
     }
 
