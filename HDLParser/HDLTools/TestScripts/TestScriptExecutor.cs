@@ -12,33 +12,37 @@ namespace HDLTools.TestScripts
         private IFileSystem fs;
         private ChipLibrary chipLibrary;
         private List<TestScriptCommand> commands;
-        private int current;
+        private int currentCommand;
         private int cycle;
         private Chip? chip;
         private StreamWriter? outputFile;
-        private StreamReader? compareFile;
+        private string[] compareFileLines;
+        private int currentCompareLine;
         private OutputListCommand? outputList;
         private bool wroteHeader;
+
+        public List<ComparisonFailure> ComparisonFailures { get; }
+        public bool HasMoreLines => currentCommand < commands.Count - 1;
+        public Chip? Chip => chip;
 
         public TestScriptExecutor(IFileSystem fs, ChipLibrary chipLibrary, List<TestScriptCommand> commands)
         {
             this.fs = fs;
             this.chipLibrary = chipLibrary;
             this.commands = commands;
-            this.current = -1;
+            this.currentCommand = -1;
             this.cycle = 0;
+            this.ComparisonFailures = new List<ComparisonFailure>();
+            this.currentCompareLine = 1; // skip the header
         }
-
-        public bool HasMoreLines => current < commands.Count - 1;
-        public Chip? Chip => chip;
 
         public void Step()
         {
             if (!HasMoreLines)
                 return;
 
-            current++;            
-            var currentCommand = commands[current];
+            this.currentCommand++;            
+            var currentCommand = commands[this.currentCommand];
 
             switch (currentCommand)
             {
@@ -50,7 +54,7 @@ namespace HDLTools.TestScripts
                     outputFile = new StreamWriter(fs.FileStream.Create(outputFileCommand.Filename, FileMode.Create));
                     break;
                 case CompareToCommand compareToCommand:
-                    compareFile = new StreamReader(fs.FileStream.Create(Path.Combine("cmp",compareToCommand.Filename), FileMode.Open));
+                    compareFileLines = fs.File.ReadAllLines(Path.Combine("cmp",compareToCommand.Filename));
                     break;
                 case OutputListCommand outputListCommand:
                     outputList = outputListCommand;
@@ -90,6 +94,8 @@ namespace HDLTools.TestScripts
                         wroteHeader = true;
                     }
 
+                    var builder = new StringBuilder();
+
                     foreach (var o in outputList.OutputSpecs)
                     {
                         var outputPin = chip.Pins.Single(x => x.Name == o.VariableName);
@@ -103,14 +109,25 @@ namespace HDLTools.TestScripts
 
                         convertedOutputValue = convertedOutputValue.Substring(convertedOutputValue.Length - o.Length);
                         convertedOutputValue = OutputPadding.PadValue(convertedOutputValue, o);
-                        outputFile.Write('|');
-                        outputFile.Write(convertedOutputValue);
+                        builder.Append('|');
+                        builder.Append(convertedOutputValue);
                     }
-                    outputFile.WriteLine('|');
-
+                    builder.Append('|');
+                    var outputLine = builder.ToString();
+                    outputFile.WriteLine(outputLine);
                     outputFile.Flush();
+
+                    if (compareFileLines != null)
+                    {
+                        if (compareFileLines[currentCompareLine] != outputLine)
+                        {
+                            ComparisonFailures.Add(new ComparisonFailure(compareFileLines[currentCompareLine], outputLine));
+                        }
+
+                        currentCompareLine++;
+                    }
                     chip.InvalidateOutputs(cycle);
-                    // do the comparison logic later
+
                     break;
                 default:
                     throw new Exception($"Unrecognized command: {currentCommand}");
@@ -118,6 +135,10 @@ namespace HDLTools.TestScripts
 
 
         }
+    }
+
+    public record ComparisonFailure(string CompareLine, string OutputLine)
+    {               
     }
 
     public class OutputPadding

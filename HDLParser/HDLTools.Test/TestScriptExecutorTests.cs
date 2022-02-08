@@ -125,13 +125,48 @@ namespace HDLTools.Test
 
             string script = File.ReadAllText(@"tst\ALU.tst");
             var commands = TestScriptParser.ParseString(script);
-
             var executor = new TestScriptExecutor(fs, library, commands);
 
             while (executor.HasMoreLines)
                 executor.Step();
 
             Assert.Equal(compare, fs.GetFile("ALU.out").TextContents);
+        }
+
+        [Fact]
+        public void ComparesUsingCompareFile()
+        {
+            var fs = new MockFileSystem();
+            var library = new ChipLibrary();            
+
+            var hdl =
+                @"CHIP And {
+                    IN a, b;
+                    OUT out;
+
+                    PARTS:
+                    Nand(a=a, b=a, out=nandab); // should be b=b, this is a bug
+                    Not(in=nandab, out=out);
+                }";
+
+
+            library.Register(HDLParser.ParseString(File.ReadAllText(@"hdl\Not.hdl")).Single());
+            library.Register(HDLParser.ParseString(hdl).Single());
+
+            string compare = File.ReadAllText(@"cmp\And.cmp");
+            fs.AddFile(@"cmp\And.cmp", new MockFileData(compare));
+            fs.AddFile(@"hdl\And.hdl", new MockFileData(hdl));
+
+            string script = File.ReadAllText(@"tst\And.tst");
+            var commands = TestScriptParser.ParseString(script);
+            var executor = new TestScriptExecutor(fs, library, commands);
+
+            while (executor.HasMoreLines)
+                executor.Step();
+
+            Assert.Single(executor.ComparisonFailures);
+            Assert.Equal("|   1   |   0   |   0   |", executor.ComparisonFailures[0].CompareLine);
+            Assert.Equal("|   1   |   0   |   1   |", executor.ComparisonFailures[0].OutputLine);
         }
     }
 }
