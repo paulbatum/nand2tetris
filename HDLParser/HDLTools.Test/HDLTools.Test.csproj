@@ -16,6 +16,11 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>
+	<ItemGroup>
+		<Content Include="..\..\03\a\*.hdl" Link="hdl\%(Filename)%(Extension)">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 
 	<ItemGroup>
 		<Content Include="..\..\01\*.cmp" Link="cmp\%(Filename)%(Extension)">
@@ -27,6 +32,11 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>
+	<ItemGroup>
+		<Content Include="..\..\03\a\*.cmp" Link="cmp\%(Filename)%(Extension)">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 
 	<ItemGroup>
 		<Content Include="..\..\01\*.tst" Link="tst\%(Filename)%(Extension)">
@@ -35,6 +45,11 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Content Include="..\..\02\*.tst" Link="tst\%(Filename)%(Extension)">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+	<ItemGroup>
+		<Content Include="..\..\03\a\*.tst" Link="tst\%(Filename)%(Extension)">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>

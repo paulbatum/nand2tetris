@@ -1,6 +1,8 @@
-﻿using System;
+﻿using HDLTools.TestScripts;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -105,6 +107,27 @@ namespace HDLTools.Test.Chapter2
             Assert.Equal(outValue, pinOut.GetValue(cycle));
             Assert.Equal(zr, pinZr.GetBit(cycle));
             Assert.Equal(ng, pinNg.GetBit(cycle));
+        }
+
+        [Fact]
+        public void PassesTestScript()
+        {
+            string compare = File.ReadAllText(@"cmp\ALU.cmp");
+
+            var fs = new MockFileSystem();
+            fs.AddFile(@"cmp\ALU.cmp", new MockFileData(compare));
+
+            var library = new ChipLibrary();
+            library.LoadAll("hdl");
+
+            string script = File.ReadAllText(@"tst\ALU.tst");
+            var commands = TestScriptParser.ParseString(script);
+            var executor = new TestScriptExecutor(fs, library, commands);
+
+            while (executor.HasMoreLines)
+                executor.Step();
+
+            Assert.Empty(executor.ComparisonFailures);
         }
     }
 }
