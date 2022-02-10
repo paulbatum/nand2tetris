@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,7 @@ namespace HDLTools.TestScripts
         private IFileSystem fs;
         private ChipLibrary chipLibrary;
         private List<TestScriptCommand> commands;
-        private int currentCommand;
+        private int currentCommandIndex;
         private int cycle;
         private Chip? chip;
         private StreamWriter? outputFile;
@@ -22,7 +23,7 @@ namespace HDLTools.TestScripts
         private bool wroteHeader;
 
         public List<ComparisonFailure> ComparisonFailures { get; }
-        public bool HasMoreLines => currentCommand < commands.Count - 1;
+        public bool HasMoreLines => currentCommandIndex < commands.Count - 1;
         public Chip? Chip => chip;
 
         public TestScriptExecutor(IFileSystem fs, ChipLibrary chipLibrary, List<TestScriptCommand> commands)
@@ -30,7 +31,7 @@ namespace HDLTools.TestScripts
             this.fs = fs;
             this.chipLibrary = chipLibrary;
             this.commands = commands;
-            this.currentCommand = -1;
+            this.currentCommandIndex = -1;
             this.cycle = 0;
             this.ComparisonFailures = new List<ComparisonFailure>();
             this.currentCompareLine = 1; // skip the header
@@ -41,8 +42,8 @@ namespace HDLTools.TestScripts
             if (!HasMoreLines)
                 return;
 
-            this.currentCommand++;            
-            var currentCommand = commands[this.currentCommand];
+            this.currentCommandIndex++;            
+            var currentCommand = commands[this.currentCommandIndex];
 
             switch (currentCommand)
             {
@@ -98,17 +99,26 @@ namespace HDLTools.TestScripts
 
                     foreach (var o in outputList.OutputSpecs)
                     {
-                        var outputPin = chip.Pins.Single(x => x.Name == o.VariableName);
-                        var outputPinValue = outputPin.GetValue(cycle);
+                        string convertedOutputValue;
+                        if (o.VariableName == "time")
+                        {
+                            var outputSuffix = cycle % 2 == 1 ? "+" : "";
+                            convertedOutputValue = $"{cycle / 2}{outputSuffix}";
+                        }
+                        else
+                        {
+                            var outputPin = chip.Pins.Single(x => x.Name == o.VariableName);
+                            var outputPinValue = outputPin.GetValue(cycle);
 
-                        var convertedOutputValue = o.Format switch
-                        {                            
-                            ValueFormat.Binary => Conversions.ConvertIntArrayToBinaryString(outputPinValue),
-                            _ => throw new Exception($"Unrecognized output format: {o.Format}"),
-                        };
+                            convertedOutputValue = o.Format switch
+                            {
+                                ValueFormat.Binary => Conversions.ConvertIntArrayToBinaryString(outputPinValue),
+                                _ => throw new Exception($"Unrecognized output format: {o.Format}"),
+                            };
 
-                        convertedOutputValue = convertedOutputValue.Substring(convertedOutputValue.Length - o.Length);
-                        convertedOutputValue = OutputPadding.PadValue(convertedOutputValue, o);
+                            convertedOutputValue = convertedOutputValue.Substring(convertedOutputValue.Length - o.Length);
+                            convertedOutputValue = OutputPadding.PadValue(convertedOutputValue, o);
+                        }
                         builder.Append('|');
                         builder.Append(convertedOutputValue);
                     }
@@ -128,6 +138,24 @@ namespace HDLTools.TestScripts
                     }
                     chip.InvalidateOutputs(cycle);
 
+                    break;
+                case TickCommand tickCommand:
+                    if (cycle % 2 != 0)
+                        throw new Exception($"Current cycle is {cycle}, expected a tock.");
+
+                    if (cycle == 0)
+                        chip.Simulate(cycle);
+
+                    Debug.WriteLine(chip.DumpTree(cycle));
+                    cycle++;                    
+                    chip.Simulate(cycle);
+                    Debug.WriteLine(chip.DumpTree(cycle));
+                    break;
+                case TockCommand tockCommand:
+                    if (cycle % 2 != 1)
+                        throw new Exception($"Current cycle is {cycle}, expected a tick.");
+                    cycle++;
+                    chip.Simulate(cycle);
                     break;
                 default:
                     throw new Exception($"Unrecognized command: {currentCommand}");

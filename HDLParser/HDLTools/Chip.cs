@@ -69,7 +69,12 @@ namespace HDLTools
         {
             foreach(var part in parts)
             {
-                part.Simulate(cycle);
+                part.Simulate(cycle);                
+            }
+
+            foreach(var pin in Pins)
+            {
+                pin.Simulate(cycle);
             }
         }
 
@@ -98,6 +103,13 @@ namespace HDLTools
             {
                 part.InvalidateAll(cycle);
             }
+        }
+
+        public string DumpTree(int cycle)
+        {
+            StringBuilder sb = new StringBuilder();
+            DumpTree(sb, cycle, "");
+            return sb.ToString();
         }
 
         public void DumpTree(StringBuilder builder, int cycle, string indent)
@@ -214,6 +226,19 @@ namespace HDLTools
         public void Init(int[] values)
         {
             this.Values[0] = values;
+        }
+
+        public virtual void Simulate(int cycle)
+        {
+            if (Values.ContainsKey(cycle))
+                return; // throw new Exception("Repeat call to simulate");
+
+            int[] result = new int[Width];
+
+            foreach (var c in connections)
+                c.Apply(result, cycle);
+
+            Values[cycle] = result;            
         }
 
         public void Invalidate(int cycle)

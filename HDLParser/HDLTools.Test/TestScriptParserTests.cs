@@ -105,5 +105,14 @@ namespace HDLTools.Test
             Assert.Throws<InvalidTestScriptException>(() => TestScriptParser.ParseString(script));
         }
 
+        [Fact]
+        public async Task ParsesBitScript()
+        {
+            var script = await File.ReadAllTextAsync("tst/Bit.tst");
+            var commands = TestScriptParser.ParseString(script);
+
+            Assert.Equal(646, commands.Count);
+        }
+
     }
 }

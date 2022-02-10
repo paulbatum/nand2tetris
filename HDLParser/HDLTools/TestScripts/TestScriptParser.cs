@@ -97,12 +97,19 @@ namespace HDLTools.TestScripts
 
             var eval = Terms.Text("eval")
                 .AndSkip(terminator)
-                .Then(x => (TestScriptCommand)new EvalCommand());
+                .Then(x => (TestScriptCommand) new EvalCommand());
 
             var output = Terms.Text("output")
                 .AndSkip(terminator)
-                .Then(x => (TestScriptCommand)new OutputCommand());
+                .Then(x => (TestScriptCommand) new OutputCommand());
 
+            var tick = Terms.Text("tick")
+                .AndSkip(terminator)
+                .Then(x => (TestScriptCommand) new TickCommand());
+
+            var tock = Terms.Text("tock")
+                .AndSkip(terminator)
+                .Then(x => (TestScriptCommand)new TockCommand());
 
             var parser = OneOrMany(
                 load
@@ -112,6 +119,8 @@ namespace HDLTools.TestScripts
                     .Or(setVariable)
                     .Or(eval)
                     .Or(output)
+                    .Or(tick)
+                    .Or(tock)
             ).Eof().ElseError("Expected EOF");
 
             if(parser.TryParse(script, out var commands, out ParseError error))

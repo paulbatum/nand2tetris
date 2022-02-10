@@ -20,7 +20,7 @@ namespace HDLTools.Test.BuiltIn
             var pinOut = chip.Pins.Single(x => x.Name == "out");
             
             pinIn.SetBit(cycle, 0);
-            Assert.Null(pinOut.GetValue(cycle)); // dff state is undefined a t = 0            
+            Assert.Equal(-1, pinOut.GetBit(cycle)); // dff state is undefined a t = 0            
 
             cycle = 1;
             chip.Simulate(cycle);

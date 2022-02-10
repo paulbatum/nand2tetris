@@ -28,10 +28,18 @@ namespace HDLTools.Builtin
 
         public override void Simulate(int cycle)
         {
-            var valueA = pinA.GetValue(cycle);
-            var valueB = pinB.GetValue(cycle);
-            var result = valueA[0] + valueB[0] < 2 ? 1 : 0;
-            pinOutput.SetBit(cycle, result);
+            var valueA = pinA.GetBit(cycle);
+            var valueB = pinB.GetBit(cycle);
+
+            if (valueA == -1 || valueB == -1)
+            {
+                pinOutput.SetBit(cycle, -1); // garbage in, garbage out
+            }
+            else 
+            {
+                var result = valueA + valueB < 2 ? 1 : 0;
+                pinOutput.SetBit(cycle, result);
+            }            
         }
 
     }

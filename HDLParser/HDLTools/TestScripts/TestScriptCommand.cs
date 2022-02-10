@@ -18,6 +18,8 @@ namespace HDLTools.TestScripts
     public record SetVariableCommand(string VariableName, VariableValue VariableValue) : TestScriptCommand;
     public record EvalCommand() : TestScriptCommand;
     public record OutputCommand() : TestScriptCommand;
+    public record TickCommand() : TestScriptCommand;
+    public record TockCommand() : TestScriptCommand;
 
     public enum ValueFormat
     {
