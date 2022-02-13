@@ -32,17 +32,15 @@ namespace HDLTools.Test.Chapter1
 
             var hdl = File.ReadAllText(@"hdl\Not16.hdl");
             ChipDescription desc = HDLParser.ParseString(hdl).Single();
-
             Chip chip = new Chip(desc, library);
 
-            var cycle = 0;
             var pinIn = chip.Pins.Single(x => x.Name == "in");            
             var pinOut = chip.Pins.Single(x => x.Name == "out");
             pinIn.Init(inValue);
 
-            chip.Simulate(cycle);
+            chip.Evaluate();
 
-            Assert.Equal(outValue, pinOut.GetValue(cycle));
+            Assert.Equal(outValue, pinOut.GetValue());
         }
     }
 }

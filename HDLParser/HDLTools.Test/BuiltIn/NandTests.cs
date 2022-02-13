@@ -19,17 +19,15 @@ namespace HDLTools.Test.BuiltIn
         {
             var chip = new Nand();
 
-
-            var cycle = 0;
             var pinA = chip.Pins.Single(x => x.Name == "a");
             var pinB = chip.Pins.Single(x => x.Name == "b");
             var pinOut = chip.Pins.Single(x => x.Name == "out");
             pinA.Init(a);
             pinB.Init(b);
 
-            chip.Simulate(cycle);
+            chip.Evaluate();
 
-            Assert.Equal(outValue, pinOut.GetBit(cycle));
+            Assert.Equal(outValue, pinOut.GetBit());
         }
     }
 }

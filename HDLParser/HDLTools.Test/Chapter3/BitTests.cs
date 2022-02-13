@@ -38,6 +38,15 @@ namespace HDLTools.Test.Chapter3
             while (executor.HasMoreLines)
                 executor.Step();
 
+            if(executor.ComparisonFailures.Count > 0)
+            {
+                testOutput.WriteLine("Compare:");
+                testOutput.WriteLine(compare);
+                testOutput.WriteLine("");
+                testOutput.WriteLine("Out:");
+                testOutput.WriteLine(fs.File.ReadAllText("Bit.out"));
+            }
+
             Assert.Empty(executor.ComparisonFailures);
         }
     }

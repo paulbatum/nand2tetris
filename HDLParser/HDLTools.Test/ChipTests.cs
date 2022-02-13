@@ -34,12 +34,11 @@ namespace HDLTools.Test
 
             var inPin = notChip.Pins.Single(x => x.Name == "in");
             var outPin = notChip.Pins.Single(x => x.Name == "out");
-            var cycle = 0;
 
             inPin.Init(0);
-            notChip.Simulate(cycle);
+            notChip.Evaluate();
 
-            Assert.Equal(1, outPin.GetBit(cycle));
+            Assert.Equal(1, outPin.GetBit());
         }
 
         [Theory]
@@ -62,15 +61,13 @@ namespace HDLTools.Test
             var library = new ChipLibrary();
             var chip = new Chip(description, library);
 
-            var cycle = 0;
-
             var inPin = chip.Pins.Single(x => x.Name == "in");
             var outPin = chip.Pins.Single(x => x.Name == "out");            
 
             inPin.Init(inString);
-            chip.Simulate(cycle);
+            chip.Evaluate();
 
-            Assert.Equal(outValue, outPin.GetBit(cycle));
+            Assert.Equal(outValue, outPin.GetBit());
         }
 
         [Theory]
@@ -95,9 +92,7 @@ namespace HDLTools.Test
 
             ChipDescription description = HDLParser.ParseString(hdl).Single();
             var library = new ChipLibrary();
-            var chip = new Chip(description, library);
-
-            var cycle = 0;
+            var chip = new Chip(description, library);            
             
             var outPin = chip.Pins.Single(x => x.Name == "out");
 
@@ -111,8 +106,8 @@ namespace HDLTools.Test
             pinC.Init(c);   
             pinD.Init(d);
 
-            chip.Simulate(cycle);
-            Assert.Equal(outValue, outPin.GetValueString(cycle));
+            chip.Evaluate();
+            Assert.Equal(outValue, outPin.GetValueString());
         }
 
         [Theory]
@@ -128,21 +123,19 @@ namespace HDLTools.Test
                     OUT out[4];
 
                     PARTS:
-                    Identity4 (in=a[0..3], out=out);                    
+                    Identity4 (in=a[0..3], out=out);
                 }";
 
             var library = new ChipLibrary();
-
             var chip = new Chip(HDLParser.ParseString(test).Single(), library);
-            var cycle = 0;
 
             var pinA = chip.Pins.Single(x => x.Name == "a");
             var outPin = chip.Pins.Single(x => x.Name == "out");
 
             pinA.Init(a);
 
-            chip.Simulate(cycle);
-            Assert.Equal(outValue, outPin.GetValueString(cycle));
+            chip.Evaluate();
+            Assert.Equal(outValue, outPin.GetValueString());
         }
 
         [Theory]
@@ -164,15 +157,15 @@ namespace HDLTools.Test
 
             var library = new ChipLibrary();
             var chip = new Chip(HDLParser.ParseString(identity8).Single(), library);
-            var cycle = 0;
+            
 
             var pinA = chip.Pins.Single(x => x.Name == "a");            
             var outPin = chip.Pins.Single(x => x.Name == "out");            
 
             pinA.Init(input);
 
-            chip.Simulate(cycle);
-            Assert.Equal(input, outPin.GetValueString(cycle));
+            chip.Evaluate();
+            Assert.Equal(input, outPin.GetValueString());
         }
         
         [Theory]
@@ -191,7 +184,6 @@ namespace HDLTools.Test
 
             var library = new ChipLibrary();
             var chip = new Chip(HDLParser.ParseString(hdl).Single(), library);
-            var cycle = 0;
 
             var pinA = chip.Pins.Single(x => x.Name == "a");
             var pinLow2 = chip.Pins.Single(x => x.Name == "low2");
@@ -199,9 +191,9 @@ namespace HDLTools.Test
 
             pinA.Init(a);
 
-            chip.Simulate(cycle);
-            Assert.Equal(low2, pinLow2.GetValueString(cycle));
-            Assert.Equal(high2, pinHigh2.GetValueString(cycle));
+            chip.Evaluate();
+            Assert.Equal(low2, pinLow2.GetValueString());
+            Assert.Equal(high2, pinHigh2.GetValueString());
         }
 
         [Theory]
@@ -224,19 +216,18 @@ namespace HDLTools.Test
 
             var library = new ChipLibrary();
             var chip = new Chip(HDLParser.ParseString(hdl).Single(), library);
-            var cycle = 0;
 
             var pinA = chip.Pins.Single(x => x.Name == "a");
             var outPin = chip.Pins.Single(x => x.Name == "out");
 
             pinA.Init(a);
 
-            chip.Simulate(cycle);
-            Assert.Equal(outValue, outPin.GetBit(cycle));
+            chip.Evaluate();
+            Assert.Equal(outValue, outPin.GetBit());
         }
 
         [Fact]
-        public void InvalidatePreservesExplicitInputPins()
+        public void EvaluateDoesNotUseCachedValues()
         {
             var hdl =
                 @"CHIP And {
@@ -256,25 +247,22 @@ namespace HDLTools.Test
             var pinA = chip.Pins.Single(x => x.Name == "a");
             var pinB = chip.Pins.Single(x => x.Name == "b");
             var pinOut = chip.Pins.Single(x => x.Name == "out");
-            var cycle = 0;
 
             pinA.Init(1);
             pinB.Init(1);
-            chip.Simulate(cycle);            
+            chip.Evaluate();
 
-            Assert.Equal(1, pinOut.GetBit(cycle));
+            Assert.Equal(1, pinOut.GetBit());
 
-            chip.InvalidateOutputs(cycle);
             pinB.Init(0);
-            chip.Simulate(cycle);
+            chip.Evaluate();
 
-            Assert.Equal(0, pinOut.GetBit(cycle));
+            Assert.Equal(0, pinOut.GetBit());
 
-            chip.InvalidateOutputs(cycle);
             pinB.Init(1);
-            chip.Simulate(cycle);
+            chip.Evaluate();
 
-            Assert.Equal(1, pinOut.GetBit(cycle));
+            Assert.Equal(1, pinOut.GetBit());
         }
     }
 }

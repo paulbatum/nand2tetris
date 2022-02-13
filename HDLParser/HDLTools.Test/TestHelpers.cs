@@ -21,9 +21,9 @@ namespace HDLTools.Test
             pin.Init(Conversions.ConvertBinaryStringToIntArray(binaryString));
         }
 
-        public static string GetValueString(this Pin pin, int cycle)
+        public static string GetValueString(this Pin pin)
         {
-            var val = pin.GetValue(cycle);
+            var val = pin.GetValue();
             return Conversions.ConvertIntArrayToBinaryString(val);
         }
 

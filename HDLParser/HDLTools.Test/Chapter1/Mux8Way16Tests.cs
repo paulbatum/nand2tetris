@@ -37,10 +37,8 @@ namespace HDLTools.Test.Chapter1
 
             var hdl = File.ReadAllText(@"hdl\Mux8Way16.hdl");
             ChipDescription desc = HDLParser.ParseString(hdl).Single();
-
             Chip chip = new Chip(desc, library);
-
-            var cycle = 0;
+            
             var inputPins = "abcdefgh"
                 .ToCharArray()
                 .Select(x => chip.Pins.Single(p => p.Name == x.ToString()))
@@ -57,9 +55,9 @@ namespace HDLTools.Test.Chapter1
                 inputPins[index].Init(inputValues[index]);
             }
 
-            chip.Simulate(cycle);
+            chip.Evaluate();
 
-            Assert.Equal(outValue, pinOut.GetValue(cycle));
+            Assert.Equal(outValue, pinOut.GetValue());
         }
     }
 }

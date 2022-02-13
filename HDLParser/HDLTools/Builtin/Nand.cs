@@ -26,21 +26,13 @@ namespace HDLTools.Builtin
             this.Pins.Add(pinOutput);
         }
 
-        public override void Simulate(int cycle)
+        internal override void Evaluate(int generation)
         {
-            var valueA = pinA.GetBit(cycle);
-            var valueB = pinB.GetBit(cycle);
+            var valueA = pinA.GetInternalValue(generation)[0];
+            var valueB = pinB.GetInternalValue(generation)[0];
 
-            if (valueA == -1 || valueB == -1)
-            {
-                pinOutput.SetBit(cycle, -1); // garbage in, garbage out
-            }
-            else 
-            {
-                var result = valueA + valueB < 2 ? 1 : 0;
-                pinOutput.SetBit(cycle, result);
-            }            
+            var result = valueA + valueB < 2 ? 1 : 0;
+            pinOutput.UpdateInternalBit(result, generation);
         }
-
     }
 }

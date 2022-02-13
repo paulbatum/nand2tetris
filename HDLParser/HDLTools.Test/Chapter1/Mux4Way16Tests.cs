@@ -36,10 +36,8 @@ namespace HDLTools.Test.Chapter1
 
             var hdl = File.ReadAllText(@"hdl\Mux4Way16.hdl");
             ChipDescription desc = HDLParser.ParseString(hdl).Single();
-
             Chip chip = new Chip(desc, library);
 
-            var cycle = 0;
             var pinA = chip.Pins.Single(x => x.Name == "a");
             var pinB = chip.Pins.Single(x => x.Name == "b");
             var pinC = chip.Pins.Single(x => x.Name == "c");
@@ -53,9 +51,9 @@ namespace HDLTools.Test.Chapter1
             pinD.Init(d);
             pinSel.Init(sel);            
 
-            chip.Simulate(cycle);
+            chip.Evaluate();
 
-            var output = pinOut.GetValue(cycle);
+            var output = pinOut.GetValue();
             Assert.Equal(outValue, output);
         }
     }

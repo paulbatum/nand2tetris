@@ -9,6 +9,8 @@ namespace HDLTools
 {
     public class Chip
     {
+        private static int generationCounter = 0;
+
         public string Name { get; }
         public string FullyQualifiedName { get; }
         
@@ -65,44 +67,43 @@ namespace HDLTools
             }
         }
 
-        public virtual void Simulate(int cycle)
+        public void Evaluate()
         {
-            foreach(var part in parts)
+            generationCounter++;
+            this.Evaluate(generationCounter);
+        }
+
+        internal virtual void Evaluate(int generation)
+        {
+            foreach (var part in parts)
             {
-                part.Simulate(cycle);                
+                part.Evaluate(generation);
             }
 
             foreach(var pin in Pins)
             {
-                pin.Simulate(cycle);
+                pin.Evaluate(generation);
             }
         }
 
-        public virtual void InvalidateOutputs(int cycle)
+        public virtual void Tick()
         {
-            foreach(var pin in Pins)
-            {                
-                if(pin.IsOutput || pin.IsInternal)
-                    pin.Invalidate(cycle);
-            }
+            Evaluate();
 
             foreach (var part in parts)
             {
-                part.InvalidateAll(cycle);
+                part.Tick();
             }
         }
 
-        protected virtual void InvalidateAll(int cycle)
+        public virtual void Tock()
         {
-            foreach (var pin in Pins)
-            {
-                pin.Invalidate(cycle);
-            }
-
             foreach (var part in parts)
             {
-                part.InvalidateAll(cycle);
+                part.Tock();
             }
+
+            Evaluate();
         }
 
         public string DumpTree(int cycle)
@@ -119,7 +120,7 @@ namespace HDLTools
 
             foreach (var pin in Pins)
             {
-                var valueString = pin.Values.TryGetValue(cycle, out int[]? values) ? string.Join("", values) : "null";                
+                var valueString = pin.Dump();
                 builder.AppendLine($"{indent}{pin.Name}:{valueString}");
             }
 
@@ -132,9 +133,11 @@ namespace HDLTools
 
     public class Pin
     {
-        private List<Connection> connections = new List<Connection>();
+        protected List<Connection> connections = new List<Connection>();
+        protected int[] internalState;
+        protected int lastStateGeneration = 0;
+        protected bool setExplicitly = false;
 
-        public Dictionary<int, int[]> Values { get; private set; }
         public bool IsInternal { get; private set; }
         public bool IsOutput { get; private set; }
         public string Name { get; private set; }
@@ -149,7 +152,7 @@ namespace HDLTools
             this.IsOutput = isOutput;
             this.IsInternal = isInternal;
 
-            this.Values = new Dictionary<int, int[]>();
+            this.internalState = new int[Width];
         }
 
         public void AddConnection(Pin target, PinReference targetReference, PinReference myReference)
@@ -174,86 +177,83 @@ namespace HDLTools
             this.connections.Add(connection);
         }
 
-        public virtual int[] GetValue(int cycle)
+        internal int[] GetInternalValue(int generation)
         {
-            if (Values.ContainsKey(cycle))
-            {
-                return Values[cycle];
-            }
-            else
-            {
-                int[] result = new int[Width];
+            if(this.setExplicitly || lastStateGeneration == generation)
+                return this.internalState;
 
-                foreach (var c in connections)
-                    c.Apply(result, cycle);
-
-                Values[cycle] = result;
-                return result;
-            }
+            //throw new Exception("Tried to get an internal value that has not been evaluated yet");
+            Evaluate(generation);
+            return this.internalState;
         }
 
-        public void SetValue(int cycle, int[] values)
+        internal void UpdateInternalBit(int value, int generation)
         {
-            if (values.Length != Width)
-                throw new Exception($"Value length mismatch on SetValue for chip '{this.FullyQualifiedName}' with width '{this.Width}', values has length {values.Length}");
-
-            this.Values[cycle] = values;
+            internalState[0] = value;
+            this.lastStateGeneration = generation;
         }
 
-        public int GetBit(int cycle)
+        internal void UpdateInternalValue(int[] values, int generation)
         {
-            var result = this.GetValue(cycle);
-
-            if (result.Length != 1)
-                throw new Exception("GetBit only supported on pins with width=1");
-
-            return result[0];
+            values.CopyTo(internalState, 0);
+            this.lastStateGeneration = generation;
         }
 
-        public void SetBit(int cycle, int value)
+        internal string Dump()
+        {
+            return $"{string.Join("", internalState)}, explicitSet={setExplicitly}, lastGen={lastStateGeneration}";
+        }
+
+        public int[] GetValue()
+        {
+            return internalState;
+        }
+
+        public int GetBit()
         {
             if (this.Width != 1)
-                throw new Exception("SetBit only supported on pins with width=1");
+                throw new Exception("GetBit only supported on pins with width=1");
 
-            SetValue(cycle, new[] { value });
+            return internalState[0];
         }
 
         public void Init(int value)
         {
-            SetBit(0, value);
+            if (this.Width != 1)
+                throw new Exception("SetBit only supported on pins with width=1");
+
+            internalState[0] = value;
+            this.setExplicitly = true;
         }
 
         public void Init(int[] values)
         {
-            this.Values[0] = values;
+            if (values.Length != this.Width)
+                throw new Exception("Lengths dont match");
+
+            values.CopyTo(internalState, 0);
+            this.setExplicitly = true;
         }
 
-        public virtual void Simulate(int cycle)
+        internal virtual void Evaluate(int generation)
         {
-            if (Values.ContainsKey(cycle))
-                return; // throw new Exception("Repeat call to simulate");
-
-            int[] result = new int[Width];
+            if (lastStateGeneration == generation)
+                return;
 
             foreach (var c in connections)
-                c.Apply(result, cycle);
+                c.Apply(this.internalState, generation);
 
-            Values[cycle] = result;            
+            lastStateGeneration = generation;
         }
 
-        public void Invalidate(int cycle)
+        protected record Connection(Pin Target, int TargetStartIndex, int MyStartIndex, int Width)
         {
-            this.Values.Remove(cycle);
-        }
-
-        private record Connection(Pin Target, int TargetStartIndex, int MyStartIndex, int Width)
-        {
-            public void Apply(int[] myState, int cycle)
+            public void Apply(int[] myState, int generation)
             {
                 // indexers are right to left, e.g. for sel=110, sel[2]=1, sel[1]=1, sel[0]=0
                 // so we have to start from the right which is width - 1
 
-                var targetState = Target.GetValue(cycle);
+                var targetState = Target.GetInternalValue(generation);
                 var myStartingPoint = myState.Length - 1 - MyStartIndex;
                 var targetStartingPoint = targetState.Length - 1 - TargetStartIndex;
 

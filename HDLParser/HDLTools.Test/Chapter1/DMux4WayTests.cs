@@ -33,10 +33,8 @@ namespace HDLTools.Test.Chapter1
 
             var hdl = File.ReadAllText(@"hdl\DMux4Way.hdl");
             ChipDescription desc = HDLParser.ParseString(hdl).Single();
-
             Chip chip = new Chip(desc, library);
 
-            var cycle = 0;
             var pinIn = chip.Pins.Single(x => x.Name == "in");
             var pinSel = chip.Pins.Single(x => x.Name == "sel");
             var pinA = chip.Pins.Single(x => x.Name == "a");
@@ -47,17 +45,15 @@ namespace HDLTools.Test.Chapter1
             pinIn.Init(@in);
             pinSel.Init(sel);
 
-            chip.Simulate(cycle);
+            chip.Evaluate();
 
-
-            testOutput.WriteLine($"OUTPUT a:{pinA.GetBit(cycle)}, b: {pinB.GetBit(cycle)}, c:{pinC.GetBit(cycle)}, d:{pinD.GetBit(cycle)}");
+            testOutput.WriteLine($"OUTPUT a:{pinA.GetBit()}, b: {pinB.GetBit()}, c:{pinC.GetBit()}, d:{pinD.GetBit()}");
             testOutput.DumpChip(chip);
-            
 
-            Assert.Equal(a, pinA.GetBit(cycle));
-            Assert.Equal(b, pinB.GetBit(cycle));
-            Assert.Equal(c, pinC.GetBit(cycle));
-            Assert.Equal(d, pinD.GetBit(cycle));
+            Assert.Equal(a, pinA.GetBit());
+            Assert.Equal(b, pinB.GetBit());
+            Assert.Equal(c, pinC.GetBit());
+            Assert.Equal(d, pinD.GetBit());
         }
     }
 }

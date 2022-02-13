@@ -35,7 +35,7 @@ namespace HDLTools.Test
                 executor.Step();            
 
             var pin = executor.Chip!.Pins.Single(x => x.Name == "a");
-            Assert.Equal(Conversions.ConvertDecimalIntToIntArray(setCommand.VariableValue.Value, pin.Width), pin.GetValue(0));
+            Assert.Equal(Conversions.ConvertDecimalIntToIntArray(setCommand.VariableValue.Value, pin.Width), pin.GetValue());
         }
 
         [Fact]
@@ -61,7 +61,7 @@ namespace HDLTools.Test
                 executor.Step();
 
             var pin = executor.Chip!.Pins.Single(x => x.Name == "x");
-            Assert.Equal(Conversions.ConvertDecimalIntToBinaryString(23, pin.Width), Conversions.ConvertIntArrayToBinaryString(pin.GetValue(0)));
+            Assert.Equal(Conversions.ConvertDecimalIntToBinaryString(23, pin.Width), Conversions.ConvertIntArrayToBinaryString(pin.GetValue()));
         }
 
         [Fact]

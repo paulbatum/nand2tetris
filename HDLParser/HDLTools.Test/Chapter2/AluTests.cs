@@ -40,10 +40,7 @@ namespace HDLTools.Test.Chapter2
 
             var hdl = File.ReadAllText(@"hdl\ALU.hdl");
             ChipDescription desc = HDLParser.ParseString(hdl).Single();
-
             Chip chip = new Chip(desc, library);
-
-            var cycle = 0;
 
             var singleInputPins = new[] { "zx", "nx", "zy", "ny", "f", "no" }    
                 .Select(x => chip.Pins.Single(p => p.Name == x.ToString()))
@@ -63,9 +60,9 @@ namespace HDLTools.Test.Chapter2
             pinX.Init(x);
             pinY.Init(y);
 
-            chip.Simulate(cycle);
+            chip.Evaluate();
 
-            Assert.Equal(outValue, pinOut.GetValue(cycle));
+            Assert.Equal(outValue, pinOut.GetValue());
         }
 
         [Theory]
@@ -77,10 +74,7 @@ namespace HDLTools.Test.Chapter2
 
             var hdl = File.ReadAllText(@"hdl\ALU.hdl");
             ChipDescription desc = HDLParser.ParseString(hdl).Single();
-
             Chip chip = new Chip(desc, library);
-
-            var cycle = 0;
 
             var singleInputPins = new[] { "zx", "nx", "zy", "ny", "f", "no" }
                 .Select(x => chip.Pins.Single(p => p.Name == x.ToString()))
@@ -102,11 +96,11 @@ namespace HDLTools.Test.Chapter2
             pinX.Init(x);
             pinY.Init(y);
 
-            chip.Simulate(cycle);
+            chip.Evaluate();
 
-            Assert.Equal(outValue, pinOut.GetValue(cycle));
-            Assert.Equal(zr, pinZr.GetBit(cycle));
-            Assert.Equal(ng, pinNg.GetBit(cycle));
+            Assert.Equal(outValue, pinOut.GetValue());
+            Assert.Equal(zr, pinZr.GetBit());
+            Assert.Equal(ng, pinNg.GetBit());
         }
 
         [Fact]

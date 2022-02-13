@@ -23,17 +23,15 @@ namespace HDLTools.Test.Chapter1
             var library = new ChipLibrary();
             var notHDL = File.ReadAllText(@"hdl\Not.hdl");
             ChipDescription notDescription = HDLParser.ParseString(notHDL).Single();
-
             Chip notChip = new Chip(notDescription, library);
 
-            var cycle = 0;
             var inputPin = notChip.Pins.Single(x => x.Name == "in");
             var outputPin = notChip.Pins.Single(x => x.Name == "out");
             inputPin.Init(inValue);
 
-            notChip.Simulate(cycle);
+            notChip.Evaluate();
 
-            Assert.Equal(outValue, outputPin.GetBit(cycle));
+            Assert.Equal(outValue, outputPin.GetBit());
         }
 
         [Theory]
@@ -56,17 +54,15 @@ namespace HDLTools.Test.Chapter1
                 }";
 
             ChipDescription wrappedNotDescription = HDLParser.ParseString(wrappedNotHDL).Single();
-
             Chip wrappedNotChip = new Chip(wrappedNotDescription, library);
 
-            var cycle = 0;
             var inputPin = wrappedNotChip.Pins.Single(x => x.Name == "in");
             var outputPin = wrappedNotChip.Pins.Single(x => x.Name == "out");
             inputPin.Init(inValue);
 
-            wrappedNotChip.Simulate(cycle);
+            wrappedNotChip.Evaluate();
 
-            Assert.Equal(outValue, outputPin.GetBit(cycle));
+            Assert.Equal(outValue, outputPin.GetBit());
         }
 
         [Theory]
@@ -90,17 +86,15 @@ namespace HDLTools.Test.Chapter1
                 }";
 
             ChipDescription doubleNotDescription = HDLParser.ParseString(doubleNotHDL).Single();
-
             Chip doubleNotChip = new Chip(doubleNotDescription, library);
 
-            var cycle = 0;
             var inputPin = doubleNotChip.Pins.Single(x => x.Name == "in");
             var outputPin = doubleNotChip.Pins.Single(x => x.Name == "out");
             inputPin.Init(inValue);
 
-            doubleNotChip.Simulate(cycle);
+            doubleNotChip.Evaluate();
 
-            Assert.Equal(outValue, outputPin.GetBit(cycle));
+            Assert.Equal(outValue, outputPin.GetBit());
         }
     }
 }

@@ -34,10 +34,8 @@ namespace HDLTools.Test.Chapter1
 
             var hdl = File.ReadAllText(@"hdl\DMux8Way.hdl");
             ChipDescription desc = HDLParser.ParseString(hdl).Single();
-
             Chip chip = new Chip(desc, library);
-
-            var cycle = 0;
+            
             var pinIn = chip.Pins.Single(x => x.Name == "in");
             var pinSel = chip.Pins.Single(x => x.Name == "sel");
 
@@ -49,13 +47,13 @@ namespace HDLTools.Test.Chapter1
             pinIn.Init(@in);
             pinSel.Init(sel);
 
-            chip.Simulate(cycle);
+            chip.Evaluate();
 
             var expectedValues = new[] { a, b, c, d, e, f, g, h };
 
             for(int index = 0; index < expectedValues.Length; index++)
             {
-                Assert.Equal(expectedValues[index], outputPins[index].GetBit(cycle));
+                Assert.Equal(expectedValues[index], outputPins[index].GetBit());
             }
         }
     }

@@ -25,11 +25,10 @@ namespace HDLTools.Builtin
             this.Pins.Add(outPin);
         }
 
-        public override void Simulate(int cycle)
+        internal override void Evaluate(int generation)
         {
-            var result = new int[Size];
-            inPin.GetValue(cycle).CopyTo(result, 0);
-            outPin.SetValue(cycle, result);
+            var temp = inPin.GetInternalValue(generation);
+            outPin.UpdateInternalValue(temp, generation);
         }
     }
 }

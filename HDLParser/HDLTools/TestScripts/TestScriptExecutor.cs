@@ -65,13 +65,15 @@ namespace HDLTools.TestScripts
                         throw new Exception("No chip loaded");
 
                     var targetPin = chip.Pins.Single(x => x.Name == setVariableCommand.VariableName);
-                    targetPin.SetValue(cycle, Conversions.ConvertDecimalIntToIntArray(setVariableCommand.VariableValue.Value, targetPin.Width));
+                    targetPin.Init(Conversions.ConvertDecimalIntToIntArray(setVariableCommand.VariableValue.Value, targetPin.Width));
                     break;
                 case EvalCommand evalCommand:
                     if (chip == null)
                         throw new Exception("No chip loaded");
-                    
-                    chip.Simulate(cycle);
+
+                    //chip.InvalidateOutputs(cycle);
+                    chip.Evaluate(); 
+                    Debug.WriteLine(chip.DumpTree(cycle));
                     break;
                 case OutputCommand outputCommand:
                     if (outputList == null)
@@ -104,11 +106,12 @@ namespace HDLTools.TestScripts
                         {
                             var outputSuffix = cycle % 2 == 1 ? "+" : "";
                             convertedOutputValue = $"{cycle / 2}{outputSuffix}";
+                            convertedOutputValue = convertedOutputValue.PadRight(o.Length);
                         }
                         else
                         {
                             var outputPin = chip.Pins.Single(x => x.Name == o.VariableName);
-                            var outputPinValue = outputPin.GetValue(cycle);
+                            var outputPinValue = outputPin.GetValue();
 
                             convertedOutputValue = o.Format switch
                             {
@@ -117,8 +120,8 @@ namespace HDLTools.TestScripts
                             };
 
                             convertedOutputValue = convertedOutputValue.Substring(convertedOutputValue.Length - o.Length);
-                            convertedOutputValue = OutputPadding.PadValue(convertedOutputValue, o);
                         }
+                        convertedOutputValue = OutputPadding.PadValue(convertedOutputValue, o);
                         builder.Append('|');
                         builder.Append(convertedOutputValue);
                     }
@@ -136,26 +139,25 @@ namespace HDLTools.TestScripts
 
                         currentCompareLine++;
                     }
-                    chip.InvalidateOutputs(cycle);
-
                     break;
                 case TickCommand tickCommand:
+                    if (chip == null)
+                        throw new Exception("No chip loaded");
                     if (cycle % 2 != 0)
                         throw new Exception($"Current cycle is {cycle}, expected a tock.");
 
-                    if (cycle == 0)
-                        chip.Simulate(cycle);
-
-                    Debug.WriteLine(chip.DumpTree(cycle));
-                    cycle++;                    
-                    chip.Simulate(cycle);
-                    Debug.WriteLine(chip.DumpTree(cycle));
+                    //Debug.WriteLine(chip.DumpTree(cycle));
+                    chip.Tick();
+                    cycle++;
+                    //Debug.WriteLine(chip.DumpTree(cycle));
                     break;
                 case TockCommand tockCommand:
+                    if (chip == null)
+                        throw new Exception("No chip loaded");
                     if (cycle % 2 != 1)
                         throw new Exception($"Current cycle is {cycle}, expected a tick.");
+                    chip.Tock();
                     cycle++;
-                    chip.Simulate(cycle);
                     break;
                 default:
                     throw new Exception($"Unrecognized command: {currentCommand}");

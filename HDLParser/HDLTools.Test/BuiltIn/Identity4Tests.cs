@@ -19,15 +19,13 @@ namespace HDLTools.Test.BuiltIn
         {
             var chip = new Identity4();
 
-
-            var cycle = 0;
             var pinIn = chip.Pins.Single(x => x.Name == "in");            
             var pinOut = chip.Pins.Single(x => x.Name == "out");
             
             pinIn.Init(inValue);            
-            chip.Simulate(cycle);
+            chip.Evaluate();
 
-            Assert.Equal(outValue, pinOut.GetValueString(cycle));
+            Assert.Equal(outValue, pinOut.GetValueString());
         }
     }
 }

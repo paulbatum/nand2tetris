@@ -10,6 +10,7 @@ namespace HDLTools.Builtin
     {
         private Pin pinIn;
         private Pin pinOut;
+        private int state;
 
         public DelayFlipFlop() : this("")
         { }
@@ -23,42 +24,14 @@ namespace HDLTools.Builtin
             this.Pins.Add(pinOut);
         }
 
-        public override void Simulate(int cycle)
+        public override void Tick()
         {
-            if (cycle == 0)
-            {
-                pinOut.SetBit(0, -1);
-            }
-            else
-            {
-                var previousValue = pinIn.GetBit(cycle - 1);
-                pinOut.SetBit(cycle, previousValue);
-            }
-
-            base.Simulate(cycle);
+            this.state = pinIn.GetBit();
         }
 
-        private class DelayFlipFlopPin : Pin
+        public override void Tock()
         {
-            public DelayFlipFlopPin(PinDescription description, bool isOutput, string fullyQualifiedParent) : base(description, isOutput, fullyQualifiedParent, isInternal:false)
-            {
-            }
-
-            //public override int[] GetValue(int cycle)
-            //{
-            //    if (Values.ContainsKey(cycle))
-            //    {
-            //        return Values[cycle];
-            //    }
-
-            //    return new[] { -1 };
-            //}
-
-            //public override void Simulate(int cycle)
-            //{
-            //    if(cycle == 0)
-            //        this.Values[0]
-            //}
+            pinOut.UpdateInternalBit(state, -1); // tocks dont have a generation.. this will probably come back to bite me later
         }
     }
 }
