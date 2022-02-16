@@ -23,7 +23,7 @@ namespace HDLTools
 
         public static string ConvertDecimalIntToBinaryString(int value, int length)
         {
-            var binaryString = Convert.ToString(value, 2);
+            var binaryString = Convert.ToString((short) value, 2);
             return binaryString.PadLeft(length, '0');
         }
 
@@ -31,6 +31,12 @@ namespace HDLTools
         {
             var binaryString = ConvertDecimalIntToBinaryString(value, length);
             return ConvertBinaryStringToIntArray(binaryString);
+        }
+
+        public static string ConvertIntArrayToDecimalString(int[] values)
+        {
+            var binaryString = ConvertIntArrayToBinaryString(values);
+            return Convert.ToInt32(binaryString, 2).ToString();
         }
     }
 }

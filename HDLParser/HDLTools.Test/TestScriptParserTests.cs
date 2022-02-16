@@ -88,6 +88,17 @@ namespace HDLTools.Test
 
             AssertIsSetCommand(commands[0], "x", 0);
         }
+        [Fact]
+        public void ParsesNegativeDecimalValues()
+        {
+            var script = @"set in -32123,";
+            var commands = TestScriptParser.ParseString(script);
+
+            Assert.Single(commands);
+
+            AssertIsSetCommand(commands[0], "in", -32123);
+        }
+
 
         [Fact]
         public async Task ParsesAluScript()
@@ -112,6 +123,15 @@ namespace HDLTools.Test
             var commands = TestScriptParser.ParseString(script);
 
             Assert.Equal(646, commands.Count);
+        }
+
+        [Fact]
+        public async Task ParsesPCScript()
+        {
+            var script = await File.ReadAllTextAsync("tst/PC.tst");
+            var commands = TestScriptParser.ParseString(script);
+
+            Assert.Equal(90, commands.Count);
         }
 
     }

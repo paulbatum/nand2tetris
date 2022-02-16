@@ -70,7 +70,7 @@ namespace HDLTools.TestScripts
                 .Then(x => (TestScriptCommand)new OutputListCommand(x));
 
             var decimalVariableValue = Terms.Text("%D")
-                .SkipAnd(Terms.Integer())
+                .SkipAnd(Terms.Integer(NumberOptions.AllowSign))
                 .Then(x => new VariableValue((int)x));
 
             var binaryVariableValue = Terms.Text("%B")
@@ -81,7 +81,7 @@ namespace HDLTools.TestScripts
                 .SkipAnd(Terms.Pattern(c => "0123456789ABCDEF".Contains(c), minSize: 1, maxSize: 4))
                 .Then(x => new VariableValue(Convert.ToInt32(x.ToString(), 16)));
 
-            var defaultVariableValue = Terms.Integer()
+            var defaultVariableValue = Terms.Integer(NumberOptions.AllowSign)
                 .Then(x => new VariableValue((int)x));
 
             var variableValue = hexVariableValue

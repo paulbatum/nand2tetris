@@ -116,10 +116,12 @@ namespace HDLTools.TestScripts
                             convertedOutputValue = o.Format switch
                             {
                                 ValueFormat.Binary => Conversions.ConvertIntArrayToBinaryString(outputPinValue),
+                                ValueFormat.Decimal => Conversions.ConvertIntArrayToDecimalString(outputPinValue),
                                 _ => throw new Exception($"Unrecognized output format: {o.Format}"),
                             };
 
-                            convertedOutputValue = convertedOutputValue.Substring(convertedOutputValue.Length - o.Length);
+                            if(o.Length < convertedOutputValue.Length)
+                                convertedOutputValue = convertedOutputValue.Substring(convertedOutputValue.Length - o.Length);
                         }
                         convertedOutputValue = OutputPadding.PadValue(convertedOutputValue, o);
                         builder.Append('|');
