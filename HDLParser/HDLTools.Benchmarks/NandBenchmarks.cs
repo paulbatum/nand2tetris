@@ -36,8 +36,8 @@ namespace HDLTools.Benchmarks
             chip.InvalidateOutputs(0);
             return result;
         }
-
-        public Vector128<byte> Avx2AndNot()
+        
+        public Vector128<byte> Avx2Nand()
         {
             byte byteA = 0b0000_0000;
             byte byteB = 0b1111_1111;
@@ -46,9 +46,9 @@ namespace HDLTools.Benchmarks
 
             var a = Vector128.Create(byteA, byteB, byteC, byteD, byteA, byteB, byteC, byteD, byteA, byteB, byteC, byteD, byteA, byteB, byteC, byteD);            
             var b = Vector128.Create(byteA, byteB, byteC, byteD, byteA, byteB, byteC, byteD, byteA, byteB, byteC, byteD, byteA, byteB, byteC, byteD);
-
-            // unfortunately, AndNot is not a Nand operation.
-            var result = Avx2.AndNot(a, b);
+            
+            var result = Avx2.And(a, b);
+            result = Avx2.Xor(result, Vector128<byte>.AllBitsSet);
             return result;
         }
 
