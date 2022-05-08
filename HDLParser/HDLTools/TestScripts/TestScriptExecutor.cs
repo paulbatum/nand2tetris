@@ -73,7 +73,7 @@ namespace HDLTools.TestScripts
 
                     //chip.InvalidateOutputs(cycle);
                     chip.Evaluate(); 
-                    Debug.WriteLine(chip.DumpTree(cycle));
+                    Debug.WriteLine(chip.DumpTree());
                     break;
                 case OutputCommand outputCommand:
                     if (outputList == null)

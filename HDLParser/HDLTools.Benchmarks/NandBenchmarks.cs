@@ -31,12 +31,12 @@ namespace HDLTools.Benchmarks
         //[Benchmark]
         public int NandGate()
         {                        
-            chip.Simulate(0);
-            var result = pinOut.GetBit(0);
-            chip.InvalidateOutputs(0);
+            chip.Evaluate();
+            var result = pinOut.GetBit();
             return result;
         }
-        
+
+        //[Benchmark]
         public Vector128<byte> Avx2Nand()
         {
             byte byteA = 0b0000_0000;

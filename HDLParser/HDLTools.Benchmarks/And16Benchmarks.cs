@@ -35,12 +35,11 @@ namespace HDLTools.Benchmarks
             pinB.Init(valueB);
         }
 
-        [Benchmark]
+        //[Benchmark]
         public int[] And16Chip()
         {
-            chip.Simulate(0);
-            var result = pinOut.GetValue(0);
-            chip.InvalidateOutputs(0);
+            chip.Evaluate();
+            var result = pinOut.GetValue();
             return result;
         }
 

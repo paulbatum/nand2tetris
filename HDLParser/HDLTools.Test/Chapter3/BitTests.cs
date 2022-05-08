@@ -49,5 +49,7 @@ namespace HDLTools.Test.Chapter3
 
             Assert.Empty(executor.ComparisonFailures);
         }
+
+
     }
 }

@@ -22,6 +22,11 @@ namespace HDLTools
             descriptions[description.Name] = description;
         }
 
+        public ChipDescription GetDescription(string name)
+        {
+            return descriptions[name];
+        }
+
 
         public Chip GetChip(string name, string fullyQualifiedParent)
         {
@@ -41,6 +46,37 @@ namespace HDLTools
             else
             {
                 throw new KeyNotFoundException($"Couldn't find a description for part '{name}'.");
+            }
+        }
+
+        //public Chip2 GetChip2()
+        //{
+        //    if (name == "Nand")
+        //        throw new NotImplementedException();
+
+        //    if (name == "DFF")
+        //        throw new NotImplementedException();
+
+        //    if (descriptions.ContainsKey(name))
+        //    {
+        //        return new Chip2(descriptions[name], this, fullyQualifiedParent);
+        //    }
+        //    else
+        //    {
+        //        throw new KeyNotFoundException($"Couldn't find a description for part '{name}'.");
+        //    }
+        //}
+
+        public void LoadAll(string hdlPath)
+        {
+            var hdlfiles = Directory.GetFiles(hdlPath, "*.hdl");
+            foreach (var hdlfile in hdlfiles)
+            {
+                var content = File.ReadAllText(hdlfile);
+                foreach (var chipDescription in HDLParser.ParseString(content))
+                {
+                    this.Register(chipDescription);
+                }
             }
         }
     }

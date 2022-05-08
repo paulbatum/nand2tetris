@@ -106,14 +106,14 @@ namespace HDLTools
             Evaluate();
         }
 
-        public string DumpTree(int cycle)
+        public string DumpTree()
         {
             StringBuilder sb = new StringBuilder();
-            DumpTree(sb, cycle, "");
+            DumpTree(sb, "");
             return sb.ToString();
         }
 
-        public void DumpTree(StringBuilder builder, int cycle, string indent)
+        public void DumpTree(StringBuilder builder, string indent)
         {
             builder.AppendLine($"{indent}{this.Name}:");
             indent = indent + "\t";
@@ -126,7 +126,7 @@ namespace HDLTools
 
             foreach (var part in parts)
             {
-                part.DumpTree(builder, cycle, indent);
+                part.DumpTree(builder, indent);
             }            
         }
     }

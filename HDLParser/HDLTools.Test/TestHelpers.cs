@@ -9,10 +9,10 @@ namespace HDLTools.Test
 {
     public static class TestHelpers
     {
-        public static void DumpChip(this ITestOutputHelper output, Chip chip, int cycle = 0)
+        public static void DumpChip(this ITestOutputHelper output, Chip chip)
         {
             var builder = new StringBuilder();
-            chip.DumpTree(builder, cycle, "");
+            chip.DumpTree(builder, "");
             output.WriteLine(builder.ToString());
         }
 
@@ -27,17 +27,5 @@ namespace HDLTools.Test
             return Conversions.ConvertIntArrayToBinaryString(val);
         }
 
-        public static void LoadAll(this ChipLibrary library, string hdlPath)
-        {
-            var hdlfiles = Directory.GetFiles(hdlPath, "*.hdl");
-            foreach (var hdlfile in hdlfiles)
-            {
-                var content = File.ReadAllText(hdlfile);
-                foreach(var chipDescription in HDLParser.ParseString(content))
-                {
-                    library.Register(chipDescription);
-                }
-            }
-        }
     }
 }

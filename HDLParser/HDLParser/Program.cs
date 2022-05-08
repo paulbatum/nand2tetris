@@ -4,12 +4,8 @@ using Parlot.Fluent;
 using System.Text;
 using static Parlot.Fluent.Parsers;
 
-var input = File.ReadAllText(@"Test.hdl");
+var library = new ChipLibrary();
+library.LoadAll("hdl");
 
-List<ChipDescription> output = HDLParser.ParseString(input);
-
-foreach (var c in output)
-{
-    Console.WriteLine(c);
-}
-
+var chip = library.GetChip("Mux", "");
+Console.WriteLine(chip.DumpTree());
