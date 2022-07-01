@@ -34,6 +34,8 @@ namespace VMTranslator
                     //"add" => new Command { CommandType = CommandType.C_ARITHMETIC, Arg1 = "add" },
                     //"eq" => new Command { CommandType = CommandType.C_ARITHMETIC, Arg1 = "eq" },
                     //"lt" => new Command { CommandType = CommandType.C_ARITHMETIC, Arg1 = "lt" },
+                    string s when s.StartsWith("if-goto") => new Command { CommandType = CommandType.C_IF, Arg1 = s.Split(' ')[1]},
+                    string s when s.StartsWith("label") => new Command {  CommandType = CommandType.C_LABEL, Arg1 = s.Split(' ')[1]},
                     _ => new Command { CommandType = CommandType.C_ARITHMETIC, Arg1 = line },
                 };
             }

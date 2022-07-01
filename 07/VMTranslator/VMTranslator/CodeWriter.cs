@@ -79,6 +79,26 @@ namespace VMTranslator
             }
         }
 
+        public void WriteLabel(string label)
+        {
+            writer.WriteLine($"({label})");
+        }
+
+        public void WriteGoto(string label)
+        {
+            writer.WriteLine("// goto " + label);
+            writer.WriteLine($"@{label}");
+            writer.WriteLine("0;JMP");
+        }
+
+        public void WriteIf(string label)
+        {
+            writer.WriteLine("// if-goto " + label);
+            writer.WriteLine("D=M");
+            writer.WriteLine($"@{label}");            
+            writer.WriteLine("D;JNE");
+        }
+
         public void WriteInfiniteLoop()
         {
             writer.WriteLine("(LOOP)");
