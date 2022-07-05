@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace HDLTools.Builtin
 {
-    public class DelayFlipFlop : Chip
+    public class DelayFlipFlop : Chip1
     {
-        private Pin pinIn;
-        private Pin pinOut;
+        private Pin1 pinIn;
+        private Pin1 pinOut;
         private int state;
 
         public DelayFlipFlop() : this("")
@@ -17,8 +17,8 @@ namespace HDLTools.Builtin
 
         public DelayFlipFlop(string fullyQualifiedParent) : base("DFF", fullyQualifiedParent)
         {
-            pinIn = new Pin(new PinDescription("in"), isOutput: false, this.FullyQualifiedName);
-            pinOut = new Pin(new PinDescription("out"), isOutput: true, this.FullyQualifiedName);
+            pinIn = new Pin1(new PinDescription("in"), isOutput: false, this.FullyQualifiedName);
+            pinOut = new Pin1(new PinDescription("out"), isOutput: true, this.FullyQualifiedName);
 
             this.Pins.Add(pinIn);
             this.Pins.Add(pinOut);

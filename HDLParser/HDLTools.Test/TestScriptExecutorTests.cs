@@ -35,7 +35,7 @@ namespace HDLTools.Test
                 executor.Step();            
 
             var pin = executor.Chip!.Pins.Single(x => x.Name == "a");
-            Assert.Equal(Conversions.ConvertDecimalIntToIntArray(setCommand.VariableValue.Value, pin.Width), pin.GetValue());
+            Assert.Equal(setCommand.VariableValue.Value, pin.GetIntValue());
         }
 
         [Fact]
@@ -50,7 +50,7 @@ namespace HDLTools.Test
                 new LoadCommand("ALU.hdl"),
                 new OutputFileCommand("ALU.out"),
                 new OutputListCommand( new List<OutputSpec> { new OutputSpec("x", ValueFormat.Binary, 1,16,1) }),
-                new SetVariableCommand("x", new VariableValue(23)),
+                new SetVariableCommand("x", new VariableValue(5)),
                 new EvalCommand(),
                 new OutputCommand(),
             };
@@ -61,7 +61,7 @@ namespace HDLTools.Test
                 executor.Step();
 
             var pin = executor.Chip!.Pins.Single(x => x.Name == "x");
-            Assert.Equal(Conversions.ConvertDecimalIntToBinaryString(23, pin.Width), Conversions.ConvertIntArrayToBinaryString(pin.GetValue()));
+            Assert.Equal("0000000000000101", Conversions.ConvertIntArrayToBinaryString(pin.GetIntArrayValue()));
         }
 
         [Fact]

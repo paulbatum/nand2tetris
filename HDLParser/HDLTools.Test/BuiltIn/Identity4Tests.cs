@@ -21,11 +21,12 @@ namespace HDLTools.Test.BuiltIn
 
             var pinIn = chip.Pins.Single(x => x.Name == "in");            
             var pinOut = chip.Pins.Single(x => x.Name == "out");
-            
-            pinIn.Init(inValue);            
+
+            pinIn.Init(Conversions.ConvertBinaryStringToIntArray(inValue));
             chip.Evaluate();
 
-            Assert.Equal(outValue, pinOut.GetValueString());
+            var val = pinOut.GetValue();
+            Assert.Equal(outValue, Conversions.ConvertIntArrayToBinaryString(val));
         }
     }
 }

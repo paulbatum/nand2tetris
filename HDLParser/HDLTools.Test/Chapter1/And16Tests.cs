@@ -43,7 +43,7 @@ namespace HDLTools.Test.Chapter1
 
             chip.Evaluate();
 
-            Assert.Equal(outValue, pinOut.GetValue());
+            Assert.Equal(outValue, pinOut.GetIntArrayValue());
         }
     }
 }

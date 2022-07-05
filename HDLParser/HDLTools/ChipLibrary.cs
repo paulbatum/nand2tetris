@@ -9,7 +9,7 @@ namespace HDLTools
 {
     public class ChipLibrary
     {
-        private Dictionary<string, ChipDescription> descriptions;
+        protected Dictionary<string, ChipDescription> descriptions;
 
         public ChipLibrary()
         {
@@ -27,46 +27,6 @@ namespace HDLTools
             return descriptions[name];
         }
 
-
-        public Chip GetChip(string name, string fullyQualifiedParent)
-        {
-            if (name == "Nand")
-                return new Nand(fullyQualifiedParent);
-
-            if (name == "Identity4")
-                return new Identity4(fullyQualifiedParent);
-
-            if (name == "DFF")
-                return new DelayFlipFlop(fullyQualifiedParent);
-
-            if(descriptions.ContainsKey(name))
-            {
-                return new Chip(descriptions[name], this, fullyQualifiedParent);
-            }
-            else
-            {
-                throw new KeyNotFoundException($"Couldn't find a description for part '{name}'.");
-            }
-        }
-
-        //public Chip2 GetChip2()
-        //{
-        //    if (name == "Nand")
-        //        throw new NotImplementedException();
-
-        //    if (name == "DFF")
-        //        throw new NotImplementedException();
-
-        //    if (descriptions.ContainsKey(name))
-        //    {
-        //        return new Chip2(descriptions[name], this, fullyQualifiedParent);
-        //    }
-        //    else
-        //    {
-        //        throw new KeyNotFoundException($"Couldn't find a description for part '{name}'.");
-        //    }
-        //}
-
         public void LoadAll(string hdlPath)
         {
             var hdlfiles = Directory.GetFiles(hdlPath, "*.hdl");
@@ -77,6 +37,42 @@ namespace HDLTools
                 {
                     this.Register(chipDescription);
                 }
+            }
+        }
+
+        public Chip GetChip(string name)
+        {
+            if (descriptions.ContainsKey(name))
+            {
+                return new Chip(descriptions[name], this);
+            }
+            else
+            {
+                throw new KeyNotFoundException($"Couldn't find a description for part '{name}'.");
+            }
+        }
+    }
+
+    public class Chip1Library : ChipLibrary
+    {
+        public Chip1 GetChip1(string name, string fullyQualifiedParent)
+        {
+            if (name == "Nand")
+                return new Nand(fullyQualifiedParent);
+
+            if (name == "Identity4")
+                return new Identity4(fullyQualifiedParent);
+
+            if (name == "DFF")
+                return new DelayFlipFlop(fullyQualifiedParent);
+
+            if (descriptions.ContainsKey(name))
+            {
+                return new Chip1(descriptions[name], this, fullyQualifiedParent);
+            }
+            else
+            {
+                throw new KeyNotFoundException($"Couldn't find a description for part '{name}'.");
             }
         }
     }

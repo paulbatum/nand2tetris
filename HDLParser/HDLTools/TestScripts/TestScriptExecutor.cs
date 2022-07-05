@@ -49,7 +49,7 @@ namespace HDLTools.TestScripts
             {
                 case LoadCommand loadCommand:
                     var chipDescription = HDLParser.ParseString(File.ReadAllText(Path.Combine("hdl", loadCommand.Filename))).Single();
-                    chip = chipLibrary.GetChip(chipDescription.Name, "");
+                    chip = chipLibrary.GetChip(chipDescription.Name);
                     break;
                 case OutputFileCommand outputFileCommand:
                     outputFile = new StreamWriter(fs.FileStream.Create(outputFileCommand.Filename, FileMode.Create));
@@ -65,7 +65,7 @@ namespace HDLTools.TestScripts
                         throw new Exception("No chip loaded");
 
                     var targetPin = chip.Pins.Single(x => x.Name == setVariableCommand.VariableName);
-                    targetPin.Init(Conversions.ConvertDecimalIntToIntArray(setVariableCommand.VariableValue.Value, targetPin.Width));
+                    targetPin.SetUShortValue( (ushort) setVariableCommand.VariableValue.Value);
                     break;
                 case EvalCommand evalCommand:
                     if (chip == null)
@@ -111,12 +111,11 @@ namespace HDLTools.TestScripts
                         else
                         {
                             var outputPin = chip.Pins.Single(x => x.Name == o.VariableName);
-                            var outputPinValue = outputPin.GetValue();
 
                             convertedOutputValue = o.Format switch
                             {
-                                ValueFormat.Binary => Conversions.ConvertIntArrayToBinaryString(outputPinValue),
-                                ValueFormat.Decimal => Conversions.ConvertIntArrayToDecimalString(outputPinValue),
+                                ValueFormat.Binary => outputPin.GetBinaryStringValue(),
+                                ValueFormat.Decimal => outputPin.GetUShortValue().ToString(),
                                 _ => throw new Exception($"Unrecognized output format: {o.Format}"),
                             };
 

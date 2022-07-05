@@ -13,9 +13,9 @@ namespace HDLTools.Benchmarks
     public class NandBenchmarks
     {
         private Nand chip;
-        private Pin pinA;
-        private Pin pinB;
-        private Pin pinOut;
+        private Pin1 pinA;
+        private Pin1 pinB;
+        private Pin1 pinOut;
 
         public NandBenchmarks()
         {

@@ -9,40 +9,149 @@ namespace HDLTools
 {
     public class Chip
     {
+        private Chip3 internalChip;
+        private Chip3.Simulator simulator;
+        private List<Pin> pins;
+
+        public IEnumerable<Pin> Pins => pins.AsReadOnly();
+
+        public Chip(ChipDescription chipDescription, ChipLibrary chipLibrary)
+        {
+            internalChip = Chip3.Build(chipDescription, chipLibrary);
+            simulator = internalChip.BuildSimulator();
+
+            pins = simulator.Pins.Select(x => new Pin(x)).ToList();
+        }
+
+        public void Tick()
+        {
+            this.Evaluate();
+        }
+
+        public void Tock()
+        {
+
+        }
+
+        public void Evaluate()
+        {
+            simulator.Simulate();
+        }
+
+        public string DumpTree()
+        {
+            StringBuilder sb = new StringBuilder();
+            DumpTree(sb, "");
+            return sb.ToString();
+        }
+
+        public void DumpTree(StringBuilder builder, string indent)
+        {
+            //builder.AppendLine($"{indent}{this.Name}:");
+            //indent = indent + "\t";
+
+            //foreach (var pin in Pins)
+            //{
+            //    var valueString = pin.Dump();
+            //    builder.AppendLine($"{indent}{pin.Name}:{valueString}");
+            //}
+
+            //foreach (var part in parts)
+            //{
+            //    part.DumpTree(builder, indent);
+            //}
+        }
+
+    }
+
+    public class Pin
+    {
+        private Chip3.SimulatorPin internalPin;
+
+        internal Pin(Chip3.SimulatorPin pin3)
+        {
+            this.internalPin = pin3;
+        }
+
+        public string Name => internalPin.Name;
+
+        public ushort GetUShortValue()
+        {
+            return internalPin.Value;
+        }
+
+        public void SetUShortValue(ushort value)
+        {
+            internalPin.Value = value;
+        }
+
+        public string GetBinaryStringValue()
+        {
+            ushort value = internalPin.Value;
+            return Convert.ToString((short) value, 2);
+        }
+
+        public void SetBinaryStringValue(string value)
+        {
+            var intValue = Convert.ToInt32(value, 2);
+            internalPin.Value = (ushort) intValue;
+        }
+
+        public string GetDecimalStringValue()
+        {
+            return internalPin.Value.ToString();
+        }
+
+        public int GetIntValue()
+        {
+            return internalPin.Value;
+        }
+
+        public int[] GetIntArrayValue()
+        {
+            return GetBinaryStringValue()
+                .ToCharArray()
+                .Select(c => int.Parse(c.ToString()))
+                .ToArray();
+        }
+    }
+
+    public class Chip1
+    {
         private static int generationCounter = 0;
 
         public string Name { get; }
         public string FullyQualifiedName { get; }
         
-        public List<Pin> Pins = new List<Pin>();
-        private List<Chip> parts = new List<Chip>();
+        public List<Pin1> Pins = new List<Pin1>();
+        private List<Chip1> parts = new List<Chip1>();
 
-        protected Chip(string name, string fullyQualifiedParent)
+        protected Chip1(string name, string fullyQualifiedParent)
         {
             this.Name = name;
             this.FullyQualifiedName = $"{fullyQualifiedParent}/{name}";
         }
 
-        public Chip(ChipDescription chipDescription, ChipLibrary chipLibrary) : this(chipDescription, chipLibrary, "")
+        public Chip1(ChipDescription chipDescription, Chip1Library chipLibrary) : this(chipDescription, chipLibrary, "")
         { }
 
-        public Chip(ChipDescription chipDescription, ChipLibrary chipLibrary, string fullyQualifiedParent) : this(chipDescription.Name, fullyQualifiedParent)
+        public Chip1(ChipDescription chipDescription, Chip1Library chipLibrary, string fullyQualifiedParent) : this(chipDescription.Name, fullyQualifiedParent)
         {            
             foreach(var inputPinDescription in chipDescription.InputPins)
             {
-                var pin = new Pin(inputPinDescription, isOutput: false, this.FullyQualifiedName);
+                var pin = new Pin1(inputPinDescription, isOutput: false, this.FullyQualifiedName);
                 Pins.Add(pin);
             }
 
             foreach (var outputPinDescription in chipDescription.OutputPins)
             {
-                var pin = new Pin(outputPinDescription, isOutput: true, this.FullyQualifiedName);
+                var pin = new Pin1(outputPinDescription, isOutput: true, this.FullyQualifiedName);
                 Pins.Add(pin);
             }
 
             foreach (PartDescription partDescription in chipDescription.Parts)
             {                
-                var child = chipLibrary.GetChip(partDescription.Name, this.FullyQualifiedName);
+                var child = chipLibrary.GetChip1(partDescription.Name, this.FullyQualifiedName);
 
                 foreach (PinAssignmentDescription pinAssignment in partDescription.PinAssignments)
                 {
@@ -54,7 +163,7 @@ namespace HDLTools
                         // this logic is duplicated from the connection code.. need to consider a refactoring
                         var internalPinSize = pinAssignment.Left.IsIndexed ? (pinAssignment.Left.EndIndex - pinAssignment.Left.StartIndex) + 1 : leftPin.Width;
                         var internalPinDescription = new PinDescription(pinAssignment.Right.Name, internalPinSize);
-                        rightPin = new Pin(internalPinDescription, isOutput: false, this.FullyQualifiedName, isInternal: true);
+                        rightPin = new Pin1(internalPinDescription, isOutput: false, this.FullyQualifiedName, isInternal: true);
                         Pins.Add(rightPin);
                     }
 
@@ -131,7 +240,7 @@ namespace HDLTools
         }
     }
 
-    public class Pin
+    public class Pin1
     {
         protected List<Connection> connections = new List<Connection>();
         protected int[] internalState;
@@ -144,7 +253,7 @@ namespace HDLTools
         public string FullyQualifiedName { get; }
         public int Width { get; private set; }
 
-        public Pin(PinDescription description, bool isOutput, string fullyQualifiedParent, bool isInternal = false)
+        public Pin1(PinDescription description, bool isOutput, string fullyQualifiedParent, bool isInternal = false)
         {
             this.Name = description.Name;
             this.FullyQualifiedName = $"{fullyQualifiedParent}/{Name}";
@@ -155,7 +264,7 @@ namespace HDLTools
             this.internalState = new int[Width];
         }
 
-        public void AddConnection(Pin target, PinReference targetReference, PinReference myReference)
+        public void AddConnection(Pin1 target, PinReference targetReference, PinReference myReference)
         {
             if (target == null)
                 throw new Exception("Cannot set a pin target to null");
@@ -246,7 +355,7 @@ namespace HDLTools
             lastStateGeneration = generation;
         }
 
-        protected record Connection(Pin Target, int TargetStartIndex, int MyStartIndex, int Width)
+        protected record Connection(Pin1 Target, int TargetStartIndex, int MyStartIndex, int Width)
         {
             public void Apply(int[] myState, int generation)
             {

@@ -20,8 +20,8 @@ namespace HDLTools.Test.BuiltIn
         [Fact]
         public void IsRegistered()
         {
-            var chipLibrary = new ChipLibrary();
-            var chip = chipLibrary.GetChip("DFF", "");
+            var chipLibrary = new Chip1Library();
+            var chip = chipLibrary.GetChip1("DFF", "");
             Assert.NotNull(chip);
         }
 
@@ -65,7 +65,7 @@ namespace HDLTools.Test.BuiltIn
         [Fact]
         public void CanHaveCycles()
         {
-            var library = new ChipLibrary();
+            var library = new Chip1Library();
             library.LoadAll("hdl");
 
             var cycleHDL =

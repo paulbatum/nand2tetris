@@ -21,11 +21,19 @@ namespace HDLTools.Test
             pin.Init(Conversions.ConvertBinaryStringToIntArray(binaryString));
         }
 
-        public static string GetValueString(this Pin pin)
+        public static void Init(this Pin pin, int value)
         {
-            var val = pin.GetValue();
-            return Conversions.ConvertIntArrayToBinaryString(val);
+            pin.SetUShortValue((ushort)value);
         }
 
+        public static void Init(this Pin pin, int[] values)
+        {
+            pin.SetBinaryStringValue(Conversions.ConvertIntArrayToBinaryString(values));
+        }
+
+        public static int GetBit(this Pin pin)
+        {
+            return pin.GetIntValue();
+        }
     }
 }

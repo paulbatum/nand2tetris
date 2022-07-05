@@ -10,7 +10,7 @@ namespace HDLTools
     {
         public string Name { get; }
         public string FullyQualifiedName { get; }
-        public ChipDescription Description { get; }
+        public ChipDescription? Description { get; }
         
         public List<Chip3> Parts { get; }
         public List<PinAssignmentDescription> PinAssignments { get; }
@@ -157,7 +157,7 @@ namespace HDLTools
             public Simulator(List<InputPin3> inputs, List<OutputPin3> outputs, List<GraphNode> sortedPinGraph)
             {
                 _values = new ushort[sortedPinGraph.Count];
-                _steps = new SimulationStep[sortedPinGraph.Count];
+                var steps = new List<SimulationStep>(sortedPinGraph.Count);
 
                 foreach(var inputPin in inputs)
                 {
@@ -169,35 +169,46 @@ namespace HDLTools
                     Pins.Add(new SimulatorPin(outputPin, _values));
                 }
 
-                for(int i = 0; i < sortedPinGraph.Count; i++)
-                {
-                    var node = sortedPinGraph[i];
+                //for(int i = 0; i < sortedPinGraph.Count; i++)
+                //{
+                //    var node = sortedPinGraph[i];
 
-                    _steps[i] = node switch
-                    {
-                        Nand3.NandOutputPin3 nandOutputPin => new SimulationStep(
-                            nandOutputPin,
-                            IsNand: true,
-                            SourceA: nandOutputPin.ParentPart.PinA.SimulatorIndex,
-                            SourceB: nandOutputPin.ParentPart.PinB.SimulatorIndex,
-                            Target: nandOutputPin.SimulatorIndex),
-                        InputPin3 p when p.SourcePin == null => new SimulationStep(
-                            p,
-                            IsNand: false,
-                            SourceA: p.SimulatorIndex,
-                            SourceB: -1,
-                            Target: p.SimulatorIndex),
-                        Pin3 p when p.SourcePin != null => new SimulationStep(
-                            p,
-                            IsNand: false,
-                            SourceA: p.SourcePin.SimulatorIndex,
-                            SourceB: 0,
-                            Target: p.SimulatorIndex
-                            ),
-                        _ => throw new Exception("Unrecognized node")                        
-                    };
+                //    var s = node switch
+                //    {
+                //        Nand3.NandOutputPin3 nandOutputPin => new SimulationStep(
+                //            nandOutputPin,
+                //            IsNand: true,
+                //            SourceA: nandOutputPin.ParentPart.PinA.SimulatorIndex,
+                //            SourceB: nandOutputPin.ParentPart.PinB.SimulatorIndex,
+                //            Target: nandOutputPin.SimulatorIndex),
+                //        InputPin3 p when p.SourcePin == null => new SimulationStep(
+                //            p,
+                //            IsNand: false,
+                //            SourceA: p.SimulatorIndex,
+                //            SourceB: -1,
+                //            Target: p.SimulatorIndex),
+                //        Pin3 p when p.SourcePin != null => new SimulationStep(
+                //            p,
+                //            IsNand: false,
+                //            SourceA: p.SourcePin.SimulatorIndex,
+                //            SourceB: 0,
+                //            Target: p.SimulatorIndex,
+                //            TruncateLeft: p.SourceReference!.IsIndexed ? 15 - p.SourceReference.EndIndex : 16 - p.Width,
+                //            ShiftRight: p.SourceReference!.IsIndexed ? p.SourceReference.StartIndex : 0
+                //            ),
+                //        _ => throw new Exception("Unrecognized node")                        
+                //    };
+
+                //    steps.Add(s);
+                //}
+
+                foreach(var node in sortedPinGraph)
+                {
+                    var s = node.GenerateSimulationSteps();
+                    steps.AddRange(s);
                 }
 
+                _steps = steps.ToArray();
                 
             }
 
@@ -212,13 +223,17 @@ namespace HDLTools
                     }
                     else
                     {
-                        _values[step.Target] = _values[step.SourceA];
+                        ushort v = _values[step.SourceA];
+                        v = (ushort)(v << step.TruncateLeft);
+                        v = (ushort)(v >> step.TruncateLeft);
+                        v = (ushort)(v >> step.ShiftRight);
+                        _values[step.Target] = v;
                     }
                 }
-            }
-
-            private readonly record struct SimulationStep(GraphNode Node, bool IsNand, int SourceA, int SourceB, int Target);
+            }            
         }
+
+        public readonly record struct SimulationStep(GraphNode Node, bool IsNand, int SourceA, int SourceB, int Target, int TruncateLeft = 0, int ShiftRight = 0);
 
         public class SimulatorPin
         {
@@ -293,7 +308,7 @@ namespace HDLTools
                     this.Parent = parent;
                 }
 
-                public override void Link(Pin3 left, PinAssignmentDescription pinAssignment)
+                public override void Link(Pin3 left, PinAssignmentDescription? pinAssignment)
                 {
                     base.Link(left, pinAssignment);
                 }
@@ -308,7 +323,7 @@ namespace HDLTools
                     this.ParentPart = parent;
                 }
 
-                public override void Link(Pin3 left, PinAssignmentDescription pinAssignment)
+                public override void Link(Pin3 left, PinAssignmentDescription? pinAssignment)
                 {
                     base.Link(left, pinAssignment);
                 }
@@ -333,22 +348,37 @@ namespace HDLTools
             {
                 return FullyQualifiedName;
             }
+
+            // move this to Pin3 later
+            public virtual IEnumerable<SimulationStep> GenerateSimulationSteps()
+            {
+                throw new Exception("can't happen");
+            }
         }
 
         public abstract class Pin3 : GraphNode
         {
-            public Pin3 SourcePin { get; private set; }
+            public Pin3? SourcePin { get; private set; }
+            public PinReference? SourceReference { get; private set; }
             public int Width { get; private set; }
             public Pin3(string name, string fullyQualifiedParent, int width) : base(name, fullyQualifiedParent)
             {
                 this.Width = width;
             }
 
-            public virtual void Link(Pin3 left, PinAssignmentDescription pinAssignment)
+            public virtual void Link(Pin3 left, PinAssignmentDescription? pinAssignment)
             {                
                 // come back to indexing
                 this.Nodes.Add(left);
                 left.SourcePin = this;
+
+                if(pinAssignment != null)                
+                    left.SourceReference = pinAssignment.Right;
+            }
+
+            public override IEnumerable<SimulationStep> GenerateSimulationSteps()
+            {
+
             }
         }
 

@@ -48,7 +48,7 @@ namespace HDLTools.Test.Chapter1
 
             chip.Evaluate();
 
-            var output = pinOut.GetValue();
+            var output = pinOut.GetIntArrayValue();
             Assert.Equal(outValue, output);
         }
     }

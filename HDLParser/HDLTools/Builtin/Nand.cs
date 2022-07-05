@@ -6,20 +6,20 @@ using System.Threading.Tasks;
 
 namespace HDLTools.Builtin
 {
-    public class Nand : Chip
+    public class Nand : Chip1
     {
-        private Pin pinA;
-        private Pin pinB;
-        private Pin pinOutput;
+        private Pin1 pinA;
+        private Pin1 pinB;
+        private Pin1 pinOutput;
 
         public Nand() : this("")
         { }
 
         public Nand(string fullyQualifiedParent) : base("Nand", fullyQualifiedParent)
         {
-            pinA = new Pin(new PinDescription("a"), isOutput: false, this.FullyQualifiedName);
-            pinB = new Pin(new PinDescription("b"), isOutput: false, this.FullyQualifiedName);
-            pinOutput = new Pin(new PinDescription("out"), isOutput: true, this.FullyQualifiedName);
+            pinA = new Pin1(new PinDescription("a"), isOutput: false, this.FullyQualifiedName);
+            pinB = new Pin1(new PinDescription("b"), isOutput: false, this.FullyQualifiedName);
+            pinOutput = new Pin1(new PinDescription("out"), isOutput: true, this.FullyQualifiedName);
 
             this.Pins.Add(pinA);
             this.Pins.Add(pinB);

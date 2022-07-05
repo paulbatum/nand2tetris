@@ -11,8 +11,6 @@ namespace HDLTools.Benchmarks
     {
         private Chip chip;
         private Pin pinOut;
-        private int[] valueA;
-        private int[] valueB;
 
         public And16Benchmarks()
         {
@@ -29,17 +27,15 @@ namespace HDLTools.Benchmarks
             var pinB = chip.Pins.Single(x => x.Name == "b");
             pinOut = chip.Pins.Single(x => x.Name == "out");
 
-            valueA = Conversions.ConvertBinaryStringToIntArray("0011110011000011");
-            valueB = Conversions.ConvertBinaryStringToIntArray("0000111111110000");
-            pinA.Init(valueA);
-            pinB.Init(valueB);
+            pinA.SetBinaryStringValue("0011110011000011");
+            pinB.SetBinaryStringValue("0000111111110000");
         }
 
         //[Benchmark]
-        public int[] And16Chip()
+        public ushort And16Chip()
         {
             chip.Evaluate();
-            var result = pinOut.GetValue();
+            var result = pinOut.GetUShortValue();
             return result;
         }
 

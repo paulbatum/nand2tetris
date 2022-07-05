@@ -107,7 +107,7 @@ namespace HDLTools.Test
             pinD.Init(d);
 
             chip.Evaluate();
-            Assert.Equal(outValue, outPin.GetValueString());
+            Assert.Equal(outValue, outPin.GetBinaryStringValue());
         }
 
         [Theory]
@@ -135,7 +135,7 @@ namespace HDLTools.Test
             pinA.Init(a);
 
             chip.Evaluate();
-            Assert.Equal(outValue, outPin.GetValueString());
+            Assert.Equal(outValue, outPin.GetBinaryStringValue());
         }
 
         [Theory]
@@ -165,7 +165,7 @@ namespace HDLTools.Test
             pinA.Init(input);
 
             chip.Evaluate();
-            Assert.Equal(input, outPin.GetValueString());
+            Assert.Equal(input, outPin.GetBinaryStringValue());
         }
         
         [Theory]
@@ -192,8 +192,8 @@ namespace HDLTools.Test
             pinA.Init(a);
 
             chip.Evaluate();
-            Assert.Equal(low2, pinLow2.GetValueString());
-            Assert.Equal(high2, pinHigh2.GetValueString());
+            Assert.Equal(low2, pinLow2.GetBinaryStringValue());
+            Assert.Equal(high2, pinHigh2.GetBinaryStringValue());
         }
 
         [Theory]

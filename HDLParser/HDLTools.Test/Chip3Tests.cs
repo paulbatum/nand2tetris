@@ -40,33 +40,6 @@ namespace HDLTools.Test
         }
 
         [Fact]
-        public void And()
-        {
-            var library = new ChipLibrary();
-            library.Register(HDLParser.ParseString(File.ReadAllText(@"hdl\Not.hdl")).Single());
-
-            var hdl = File.ReadAllText(@"hdl\And.hdl");
-            ChipDescription desc = HDLParser.ParseString(hdl).Single();
-
-            var chip = Chip3.Build(desc, library);
-            chip.BuildSimulator();
-        }
-
-        [Fact]
-        public void Or()
-        {
-            var library = new ChipLibrary();
-            library.Register(HDLParser.ParseString(File.ReadAllText(@"hdl\And.hdl")).Single());
-            library.Register(HDLParser.ParseString(File.ReadAllText(@"hdl\Not.hdl")).Single());
-
-            var hdl = File.ReadAllText(@"hdl\Or.hdl");
-            ChipDescription desc = HDLParser.ParseString(hdl).Single();
-
-            var chip = Chip3.Build(desc, library);
-            chip.BuildSimulator();
-        }
-
-        [Fact]
         public void Mux()
         {
             var library = new ChipLibrary();

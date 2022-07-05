@@ -62,7 +62,7 @@ namespace HDLTools.Test.Chapter2
 
             chip.Evaluate();
 
-            Assert.Equal(outValue, pinOut.GetValue());
+            Assert.Equal(outValue, pinOut.GetIntArrayValue());
         }
 
         [Theory]
@@ -98,7 +98,7 @@ namespace HDLTools.Test.Chapter2
 
             chip.Evaluate();
 
-            Assert.Equal(outValue, pinOut.GetValue());
+            Assert.Equal(outValue, pinOut.GetIntArrayValue());
             Assert.Equal(zr, pinZr.GetBit());
             Assert.Equal(ng, pinNg.GetBit());
         }
