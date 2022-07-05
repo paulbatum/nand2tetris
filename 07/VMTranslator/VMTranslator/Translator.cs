@@ -32,6 +32,9 @@ namespace VMTranslator
                     case CommandType.C_IF:
                         codeWriter.WriteIf(current.Arg1);
                         break;
+                    case CommandType.C_GOTO:
+                        codeWriter.WriteGoto(current.Arg1);
+                        break;
                     default:
                         throw new Exception($"No handling for '{current.CommandType}.");
                 }
