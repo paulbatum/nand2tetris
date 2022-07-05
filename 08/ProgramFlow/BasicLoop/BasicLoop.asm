@@ -157,7 +157,11 @@ M=D
 @SP
 M=M+1
 // if-goto LOOP_START
+@SP
+M=M-1
+A=M
 D=M
+@SP
 @LOOP_START
 D;JNE
 // push local 0

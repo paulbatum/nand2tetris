@@ -94,7 +94,7 @@ namespace VMTranslator
         public void WriteIf(string label)
         {
             writer.WriteLine("// if-goto " + label);
-            writer.WriteLine("D=M");
+            WritePopD();
             writer.WriteLine($"@{label}");            
             writer.WriteLine("D;JNE");
         }
