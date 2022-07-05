@@ -79,6 +79,67 @@ namespace VMTranslator
             }
         }
 
+        public void WriteFunction(string functionName, int nVars)
+        {
+            WriteLabel(functionName);
+            writer.WriteLine("@0");
+            writer.WriteLine("D=A");
+            for (int i = 0; i < nVars; i++)
+                WritePushD();
+        }
+
+        public void WriteReturn()
+        {
+            // frame = LCL
+            // store in r13
+            writer.WriteLine($"@LCL");
+            writer.WriteLine("D=M");
+            writer.WriteLine("@R13");
+            writer.WriteLine("M=D");
+
+            // retAddr = *(frame - 5)
+            // store in r14
+            writer.WriteLine("@5");
+            writer.WriteLine("A=D-A");
+            writer.WriteLine("D=M");
+            writer.WriteLine("@R14");
+            writer.WriteLine("M=D");
+
+            // * ARG = pop()
+            WritePopD();
+            writer.WriteLine("@ARG");
+            writer.WriteLine("A=M");
+            writer.WriteLine("M=D");
+
+            // SP = ARG+1
+            writer.WriteLine("@ARG");
+            writer.WriteLine("D=M+1");
+            writer.WriteLine("@SP");
+            writer.WriteLine("M=D");
+
+            void SetToFrameMinusN(string address, int n) {
+                writer.WriteLine("@R13");
+                writer.WriteLine("D=M");
+                writer.WriteLine($"@{n}");
+                writer.WriteLine("A=D-A");
+                writer.WriteLine("D=M");
+                writer.WriteLine($"@{address}");
+                writer.WriteLine("M=D");
+            }
+
+            SetToFrameMinusN("THAT", 1);
+            SetToFrameMinusN("THIS", 2);
+            SetToFrameMinusN("ARG", 3);
+            SetToFrameMinusN("LCL", 4);
+
+            // goto RetAddr
+            writer.WriteLine("@R14");
+            writer.WriteLine("A=M");
+            writer.WriteLine("0;JMP");
+
+
+        }
+
         public void WriteLabel(string label)
         {
             writer.WriteLine($"({label})");

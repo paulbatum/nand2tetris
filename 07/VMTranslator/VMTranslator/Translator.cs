@@ -35,7 +35,13 @@ namespace VMTranslator
                     case CommandType.C_GOTO:
                         codeWriter.WriteGoto(current.Arg1);
                         break;
-                    default:
+                    case CommandType.C_FUNCTION:
+                        codeWriter.WriteFunction(current.Arg1, current.Arg2);
+                        break;
+                    case CommandType.C_RETURN:
+                        codeWriter.WriteReturn();
+                        break;
+                    default:                    
                         throw new Exception($"No handling for '{current.CommandType}.");
                 }
             }
