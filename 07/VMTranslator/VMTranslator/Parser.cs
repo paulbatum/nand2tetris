@@ -39,6 +39,7 @@ namespace VMTranslator
                     string s when s.StartsWith("if-goto") => new Command { CommandType = CommandType.C_IF, Arg1 = s.Split(' ')[1] },
                     string s when s.StartsWith("label") => new Command {  CommandType = CommandType.C_LABEL, Arg1 = s.Split(' ')[1] },
                     string s when s.StartsWith("return") => new Command { CommandType = CommandType.C_RETURN },
+                    string s when s.StartsWith("call") => new Command {  CommandType = CommandType.C_CALL, Arg1 = s.Split(' ')[1], Arg2 = int.Parse(s.Split(' ')[2]) },
                     _ => new Command { CommandType = CommandType.C_ARITHMETIC, Arg1 = line },
                 };
             }

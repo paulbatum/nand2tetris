@@ -6,15 +6,25 @@ using System.Text;
 namespace VMTranslator
 {
     public class CodeWriter
-    {
-        private string fileName;
+    {        
         private StreamWriter writer;
-        private int labelCounter = 0;        
+        private int labelCounter = 0;
+
+        public string FileName { get; set; }
 
         public CodeWriter(string fileName, StreamWriter writer)
         {
             this.writer = writer;
-            this.fileName = fileName;
+            this.FileName = fileName;
+        }
+
+        public void WriteBootstrap()
+        {
+            writer.WriteLine("@256");
+            writer.WriteLine("D=A");
+            writer.WriteLine("@SP");
+            writer.WriteLine("M=D");
+            WriteCall("Sys.init", 0);
         }
 
         public void WritePushPop(CommandType commandType, string segment, int index)
@@ -31,7 +41,7 @@ namespace VMTranslator
                     }
                     else if (segment == "static")
                     {
-                        writer.WriteLine($"@{fileName}.{index}");
+                        writer.WriteLine($"@{FileName}.{index}");
                         writer.WriteLine($"D=M");
                         WritePushD();
                     }
@@ -51,7 +61,7 @@ namespace VMTranslator
                     if (segment == "static")
                     {
                         WritePopD();
-                        writer.WriteLine($"@{fileName}.{index}");
+                        writer.WriteLine($"@{FileName}.{index}");
                         writer.WriteLine("M=D");
                     }
                     else
@@ -77,6 +87,57 @@ namespace VMTranslator
                 default:
                     throw new ArgumentException($"Cannot push/pop command '{commandType}'.");
             }
+        }
+
+        internal void WriteCall(string functionName, int nArgs)
+        {
+            // push return address
+            string returnLabel = $"{FileName}.return.{labelCounter++}";
+            writer.WriteLine($"@{returnLabel}");
+            writer.WriteLine("D=A");
+            WritePushD();
+
+            // push LCL
+            writer.WriteLine("@LCL");
+            writer.WriteLine("D=M");
+            WritePushD();
+
+            // push ARG
+            writer.WriteLine("@ARG");
+            writer.WriteLine("D=M");
+            WritePushD();
+
+            // push THIS
+            writer.WriteLine("@THIS");
+            writer.WriteLine("D=M");
+            WritePushD();
+
+            // push THAT
+            writer.WriteLine("@THAT");
+            writer.WriteLine("D=M");
+            WritePushD();
+
+            // ARG = SP-5-nArgs
+            writer.WriteLine("@SP");
+            writer.WriteLine("D=M");
+            writer.WriteLine("@5");
+            writer.WriteLine("D=D-A");
+            writer.WriteLine($"@{nArgs}");
+            writer.WriteLine("D=D-A");
+            writer.WriteLine("@ARG");
+            writer.WriteLine("M=D");
+
+            // LCL = SP
+            writer.WriteLine("@SP");
+            writer.WriteLine("D=M");
+            writer.WriteLine("@LCL");
+            writer.WriteLine("M=D");
+            
+            // goto functionName
+            WriteGoto(functionName);
+
+            // inject return label;
+            WriteLabel(returnLabel);
         }
 
         public void WriteFunction(string functionName, int nVars)

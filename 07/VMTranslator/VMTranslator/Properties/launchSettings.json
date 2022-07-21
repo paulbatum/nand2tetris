@@ -2,7 +2,7 @@
   "profiles": {
     "VMTranslator": {
       "commandName": "Project",
-      "commandLineArgs": "D:\\code\\nand2tetris\\projects\\08\\FunctionCalls\\SimpleFunction\\SimpleFunction.vm"
+      "commandLineArgs": "D:\\code\\nand2tetris\\projects\\08\\FunctionCalls\\StaticsTest"
     }
   }
 }
