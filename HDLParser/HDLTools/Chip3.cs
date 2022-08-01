@@ -169,7 +169,7 @@ namespace HDLTools
                     Pins.Add(new SimulatorPin(outputPin, _values));
                 }
 
-                //for(int i = 0; i < sortedPinGraph.Count; i++)
+                //for (int i = 0; i < sortedPinGraph.Count; i++)
                 //{
                 //    var node = sortedPinGraph[i];
 
@@ -196,13 +196,13 @@ namespace HDLTools
                 //            TruncateLeft: p.SourceReference!.IsIndexed ? 15 - p.SourceReference.EndIndex : 16 - p.Width,
                 //            ShiftRight: p.SourceReference!.IsIndexed ? p.SourceReference.StartIndex : 0
                 //            ),
-                //        _ => throw new Exception("Unrecognized node")                        
+                //        _ => throw new Exception("Unrecognized node")
                 //    };
 
                 //    steps.Add(s);
                 //}
 
-                foreach(var node in sortedPinGraph)
+                foreach (var node in sortedPinGraph)
                 {
                     var s = node.GenerateSimulationSteps();
                     steps.AddRange(s);
@@ -217,9 +217,13 @@ namespace HDLTools
                 for(int i = 0; i < _steps.Length; i++)
                 {
                     var step = _steps[i];
-                    if(step.IsNand)
+
+                    ushort result;
+                    ushort previous = _values[step.Target];
+
+                    if (step.IsNand)
                     {
-                        _values[step.Target] = (ushort)~(_values[step.SourceA] & _values[step.SourceB]);
+                        result = (ushort)~(_values[step.SourceA] & _values[step.SourceB]);
                     }
                     else
                     {
@@ -227,13 +231,20 @@ namespace HDLTools
                         v = (ushort)(v << step.TruncateLeft);
                         v = (ushort)(v >> step.TruncateLeft);
                         v = (ushort)(v >> step.ShiftRight);
-                        _values[step.Target] = v;
+                        result = v;
                     }
+
+
+                    // totally made up - need to figure this out
+                    ushort vv = (ushort)(result << step.TargetStartIndex);
+                    vv = (ushort) (vv >> step.TargetEndIndex);
+                    ushort final = (ushort)(previous | vv);
+                    _values[step.Target] = final;
                 }
             }            
         }
 
-        public readonly record struct SimulationStep(GraphNode Node, bool IsNand, int SourceA, int SourceB, int Target, int TruncateLeft = 0, int ShiftRight = 0);
+        public readonly record struct SimulationStep(GraphNode Node, bool IsNand, int SourceA, int SourceB, int Target, int TargetStartIndex = 0, int TargetEndIndex = 0, int TruncateLeft = 0, int ShiftRight = 0);
 
         public class SimulatorPin
         {
@@ -327,6 +338,17 @@ namespace HDLTools
                 {
                     base.Link(left, pinAssignment);
                 }
+
+                public override IEnumerable<SimulationStep> GenerateSimulationSteps()
+                {
+                    yield return new SimulationStep(
+                        this,
+                        IsNand: true,
+                        SourceA: this.ParentPart.PinA.SimulatorIndex,
+                        SourceB: this.ParentPart.PinB.SimulatorIndex,
+                        Target: this.SimulatorIndex
+                    );
+                }
             }
         }
 
@@ -354,15 +376,18 @@ namespace HDLTools
             {
                 throw new Exception("can't happen");
             }
-        }
+        }        
 
         public abstract class Pin3 : GraphNode
         {
-            public Pin3? SourcePin { get; private set; }
-            public PinReference? SourceReference { get; private set; }
+            protected List<SourceReference> _sources;
+
+            //public Pin3? SourcePin { get; private set; }
+            //public PinReference? SourceReference { get; private set; }
             public int Width { get; private set; }
             public Pin3(string name, string fullyQualifiedParent, int width) : base(name, fullyQualifiedParent)
             {
+                _sources = new List<SourceReference>();
                 this.Width = width;
             }
 
@@ -370,22 +395,90 @@ namespace HDLTools
             {                
                 // come back to indexing
                 this.Nodes.Add(left);
-                left.SourcePin = this;
 
-                if(pinAssignment != null)                
-                    left.SourceReference = pinAssignment.Right;
+                left.AddSource(this, pinAssignment);
+
+                //if (left.SourcePin != null)
+                //{
+                //    throw new Exception("this is the bug");
+                //}
+                //else
+                //{
+                //    left.SourcePin = this;
+                //}
+
+                //if(pinAssignment != null)                
+                //    left.SourceReference = pinAssignment.Right;
+            }
+
+            public virtual void AddSource(Pin3 source, PinAssignmentDescription assignmentDescription)
+            {
+                _sources.Add(new SourceReference(source, assignmentDescription));
             }
 
             public override IEnumerable<SimulationStep> GenerateSimulationSteps()
             {
+                //if (this.SourcePin != null)
+                //{
+                //    yield return new SimulationStep(
+                //            this,
+                //            IsNand: false,
+                //            SourceA: this.SourcePin.SimulatorIndex,
+                //            SourceB: 0,
+                //            Target: this.SimulatorIndex,
+                //            TruncateLeft: this.SourceReference!.IsIndexed ? 15 - this.SourceReference.EndIndex : 16 - this.Width,
+                //            ShiftRight: this.SourceReference!.IsIndexed ? this.SourceReference.StartIndex : 0
+                //    );
+                //}
+                //else
+                //{
+                //    throw new Exception("We shouldn't reach here");
+                //}
+
+                foreach(var s in _sources)
+                {
+                    yield return new SimulationStep(
+                            this,
+                            IsNand: false,
+                            SourceA: s.Source.SimulatorIndex,
+                            SourceB: 0,
+                            Target: this.SimulatorIndex,
+                            TargetStartIndex: s.AssignmentDescription.Left.IsIndexed ? s.AssignmentDescription.Left.StartIndex : 0, // might be wrong
+                            TargetEndIndex: s.AssignmentDescription.Left.IsIndexed ? s.AssignmentDescription.Left.EndIndex : 0, // might be wrong
+                            TruncateLeft: s.AssignmentDescription.Right.IsIndexed ? 15 - s.AssignmentDescription.Right.EndIndex : 16 - this.Width,
+                            ShiftRight: s.AssignmentDescription.Right.IsIndexed ? s.AssignmentDescription.Right.StartIndex : 0
+                    );
+                }
 
             }
+
+            protected record SourceReference(Pin3 Source, PinAssignmentDescription AssignmentDescription);
         }
 
         public class InputPin3 : Pin3
         {
             public InputPin3(string name, string fullyQualifiedParent, int width) : base(name, fullyQualifiedParent, width)
             {
+            }
+
+            public override IEnumerable<SimulationStep> GenerateSimulationSteps()
+            {
+                if(this._sources.Count == 0)
+                {
+                    yield return new SimulationStep(
+                            this,
+                            IsNand: false,
+                            SourceA: this.SimulatorIndex,
+                            SourceB: -1,
+                            Target: this.SimulatorIndex);
+                }
+                else
+                {
+                    foreach (var s in base.GenerateSimulationSteps())
+                    {
+                        yield return s;
+                    }
+                }
             }
         }
 
