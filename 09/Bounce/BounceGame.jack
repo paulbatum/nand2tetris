@@ -1,0 +1,52 @@
+class BounceGame {
+   field Ball ball;
+   field int speed;
+
+   constructor BounceGame new() {
+       let ball = Ball.new();
+       let speed = 2;
+      return this;
+   }
+
+   method void run() {
+      var char key;  // the key currently pressed by the user
+      var boolean exit;
+      let exit = false;
+
+      while (~exit) {
+         // waits for a key to be pressed
+         while (key = 0) {
+            let key = Keyboard.keyPressed();
+            do moveBall();
+         }
+         if (key = 81)  { let exit = true; }     // q key
+         if (key = 130) { let speed = speed + 1; }   // left arrow
+         if (key = 132) {
+             let speed = speed - 1;
+             if (speed < 0) { let speed = 0; }
+         }   // right arrow
+
+         // waits for the key to be released
+         while (~(key = 0)) {
+            let key = Keyboard.keyPressed();
+            do moveBall();
+         }
+     }
+     return;
+   }
+
+   method void moveBall() {
+       do ball.erase();
+       do ball.update();
+       do ball.draw();
+       do Sys.wait(speed);
+       return;
+   }
+
+   /** Disposes this game. */
+   method void dispose() {
+      do ball.dispose();
+      do Memory.deAlloc(this);
+      return;
+   }
+}

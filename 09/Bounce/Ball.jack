@@ -1,0 +1,55 @@
+class Ball {
+   field int radius;
+   field int x;
+   field int y;
+   field int deltaX;
+   field int deltaY;
+
+
+   constructor Ball new() {
+      let radius = 5;
+      let x = 50;
+      let y = 50;
+      let deltaX = 2;
+      let deltaY = 1;
+      return this;
+   }
+
+   method void update() {
+       var int newX;
+       var int newY;
+
+       let newX = x + deltaX;
+       let newY = y + deltaY;
+
+        // (wow this sucks)
+       if ((newX < (radius + 1)) | (newX > (512 - 1 - radius))) {
+           let deltaX = -1 * deltaX;
+       }
+       if ((newY < (radius + 1)) | (newY > (256 - 1 - radius))) {
+           let deltaY = -1 * deltaY;
+       }
+
+       let x = x + deltaX;
+       let y = y + deltaY;
+
+       return;
+   }
+
+    method void draw() {
+      do Screen.setColor(true);
+      do Screen.drawCircle(x, y, radius);
+      return;
+   }
+
+   method void erase() {
+      do Screen.setColor(false);
+      do Screen.drawCircle(x, y, radius);
+      return;
+   }
+
+   method void dispose() {
+      do Memory.deAlloc(this);
+      return;
+   }
+}
