@@ -1,8 +1,11 @@
 {
   "profiles": {
-    "JackAnalyzer": {
+    "JackAnalyzer - Square": {
       "commandName": "Project",
       "workingDirectory": "D:\\code\\nand2tetris\\projects\\10\\Square"
+    },
+    "Jack Analyzer - Local": {
+      "commandName": "Project"
     }
   }
 }

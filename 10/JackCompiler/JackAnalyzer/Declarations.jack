@@ -1,0 +1,6 @@
+﻿class Square {
+
+   field int x, y; 
+   field int size; 
+
+}

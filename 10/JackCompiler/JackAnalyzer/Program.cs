@@ -24,6 +24,26 @@ namespace JackAnalyzer
 
             string parentDir = Directory.GetParent(files[0]).FullName;
 
+            
+
+            //OutputTokens(files, parentDir);
+
+            foreach (var f in files)
+            {
+                using (var input = new StreamReader(f))
+                {
+                    var outputFileName = Path.Combine(parentDir, Path.GetFileNameWithoutExtension(f) + ".output.xml");
+                    using (var writer = new StreamWriter(outputFileName))
+                    {
+                        CompilationEngine engine = new CompilationEngine(input, writer);
+                        engine.CompileClass();
+                    }
+                }
+            }            
+        }
+
+        private static void OutputTokens(string[] files, string parentDir)
+        {
             foreach (var f in files)
             {
                 using (var input = new StreamReader(f))
@@ -33,7 +53,7 @@ namespace JackAnalyzer
 
                     JackTokenizer tokenizer = new JackTokenizer(input);
                     output.AppendLine("<tokens>");
-                    while(tokenizer.HasMoreTokens)
+                    while (tokenizer.HasMoreTokens)
                     {
                         tokenizer.Advance();
 
@@ -43,47 +63,21 @@ namespace JackAnalyzer
 
                         string outVal = current.Value switch
                         {
-                            char c when c == '>' => "&gt;",
-                            char c when c == '<' => "&lt;",
-                            char c when c == '&' => "&amp;",
-                            object o => o.ToString()
+                            string s when s == ">" => "&gt;",
+                            string s when s == "<" => "&lt;",
+                            string s when s == "&" => "&amp;",
+                            string s => s
                         };
 
                         output.AppendLine($"<{tokenName}> {outVal} </{tokenName}>");
 
-                        
+
                     }
                     output.AppendLine("</tokens>");
 
                     File.WriteAllText(outputFileName, output.ToString());
                 }
             }
-
-                    
-                    
-
-            //string parentDir = Directory.GetParent(files[0]).FullName;
-            //var outputFileName = Path.Combine(parentDir, Path.GetFileNameWithoutExtension(parentDir) + ".xml");
-
-
-            //using (var output = new StreamWriter(outputFileName))
-            //{
-            //    var codeWriter = new CodeWriter("bootstrap", output);
-            //    codeWriter.WriteBootstrap();
-
-            //    var translator = new Translator(codeWriter);
-
-            //    foreach (var f in files)
-            //    {
-            //        using (var input = new StreamReader(f))
-            //        {
-            //            Console.WriteLine("Reading {0}", Path.GetFullPath(f));
-            //            translator.Translate(Path.GetFileNameWithoutExtension(f), input);
-            //        }
-            //    }
-
-            //    Console.WriteLine("Wrote {0}", Path.GetFullPath(outputFileName));
-            
         }
     }
 }

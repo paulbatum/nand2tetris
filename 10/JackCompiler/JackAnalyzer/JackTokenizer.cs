@@ -67,7 +67,7 @@ namespace JackAnalyzer
 
                 if(symbols.Contains(readChar))
                 {
-                    yield return new Token(TokenType.Symbol, readChar);
+                    yield return new Token(TokenType.Symbol, readChar.ToString());
                     continue;
                 }
 
@@ -95,7 +95,7 @@ namespace JackAnalyzer
 
                     if(keywords.Contains(keywordOrIdentifier))
                     {
-                        yield return new Token(TokenType.Keyword, keywordOrIdentifier);
+                        yield return new Token(TokenType.Keyword, keywordOrIdentifier, Keyword: Enum.Parse<Keyword>(keywordOrIdentifier, ignoreCase: true));
                         continue;
                     }
 
@@ -124,7 +124,7 @@ namespace JackAnalyzer
         }
     }
 
-    public record Token(TokenType TokenType, object Value);
+    public record Token(TokenType TokenType, string Value, Keyword? Keyword = null);
 
     public enum TokenType
     {
