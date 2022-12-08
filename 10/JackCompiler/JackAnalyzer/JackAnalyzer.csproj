@@ -8,6 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Update="Constructor.jack">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Declarations.jack">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -1,0 +1,11 @@
+﻿class Square {
+
+   field int x, y; 
+   field int size; 
+
+   constructor Square new(int x, int y) {
+		var int foo;
+		var char bar,baz;
+   }
+
+}

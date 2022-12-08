@@ -10,6 +10,7 @@ namespace JackAnalyzer
     {
         private JackTokenizer tokenizer;
         private StreamWriter output;
+        private bool expectingLastToken = false;
 
         public CompilationEngine(StreamReader input, StreamWriter output)
         {
@@ -17,15 +18,17 @@ namespace JackAnalyzer
             this.output = output;
         }
 
-
-
+        private Token ct => tokenizer.CurrentToken ?? throw new Exception("Why is the current token null?");        
+        
         public void CompileClass()
         {
-            tokenizer.Advance();
-            output.WriteLine("<class>");
-            Process(Keyword.Class);
-            Process(TokenType.Identifier);
-            Process(TokenType.Symbol, "{");
+            // There is no initial token.
+            Advance();
+
+            WriteStartElement("class");
+            ProcessKeyword(Keyword.Class);
+            ProcessIdentifier(description: "class name");
+            ProcessSymbol("{");
           
             while (CurrentTokenIsClassVarDec)
             {
@@ -37,97 +40,102 @@ namespace JackAnalyzer
                 CompileSubroutineDec();
             }
 
-            Process(TokenType.Symbol, "}");
-
-            output.WriteLine("</class>");
+            expectingLastToken = true;
+            ProcessSymbol("}");
+            WriteEndElement("class");            
         }
 
         private void CompileClassVarDec()
         {
-            output.WriteLine("<classVarDec>");
+            WriteStartElement("classVarDec");
+            ProcessOneOf(Keyword.Static, Keyword.Field);
 
-            Process((Keyword) tokenizer.CurrentToken.Keyword); // static or field
+            if (CurrentTokenIsTypename == false)
+                throw new Exception($"Expected typename (int/char/bool/classname). Current token: {tokenizer.CurrentToken}.");
 
-            Token typeToken = tokenizer.CurrentToken switch
+            Process(); // typename
+            ProcessIdentifier(description: "variable name");
+
+            while(CurrentTokenIsComma)
             {
-                Token t when t.Keyword == Keyword.Int => t,
-                Token t when t.Keyword == Keyword.Char => t,
-                Token t when t.Keyword == Keyword.Boolean => t,
-                Token t when t.TokenType == TokenType.Identifier => t,
-                _ => throw new Exception($"Expected typename (int/char/bool/classname). Current token: {tokenizer.CurrentToken}.")
-            };
-
-            Process(typeToken);
-            Process(TokenType.Identifier); // variable name
-            while(tokenizer.CurrentToken.TokenType == TokenType.Symbol && tokenizer.CurrentToken.Value.ToString() == ",")
-            {
-                Process(TokenType.Symbol, ",");
-                Process(TokenType.Identifier); // more variable names
+                ProcessSymbol(",");
+                ProcessIdentifier("variable name");
             }
 
-            Process(TokenType.Symbol, ";");
-            output.WriteLine("</classVarDec>");
+            ProcessSymbol(";");
+            WriteEndElement("classVarDec");
         }
 
         private void CompileSubroutineDec()
         {
-            output.WriteLine("<subroutineDec>");
+            WriteStartElement("subroutineDec");
+            ProcessOneOf(Keyword.Constructor, Keyword.Function, Keyword.Method);
 
-            output.WriteLine("</subroutineDec>");
-            tokenizer.Advance();
-        }
-
-        private void Process(Token token)
-        {
-            WriteXml(tokenizer.CurrentToken);
-            tokenizer.Advance();
-        }
-
-        private void Process(Keyword keyword)
-        {
-            var ct = tokenizer.CurrentToken;
-            if(ct.Keyword == keyword)
+            if (ct.TokenType == TokenType.Identifier ||
+               (ct.TokenType == TokenType.Keyword && ct.Keyword == Keyword.Void))
             {
-                WriteXml(ct);
+                Process();
             }
             else
             {
-                throw new Exception($"Expected keyword: '{keyword}'. Current token: '{ct}'.");
+                throw new Exception($"Expected identifier or void. Current token: {tokenizer.CurrentToken}.");
             }
 
-            tokenizer.Advance();
+            ProcessIdentifier(description: "subroutine name");
+            ProcessSymbol("(");
+
+            while(CurrentTokenIsTypename)
+            {
+                ProcessTypename();
+                ProcessIdentifier(description: "variable name");
+                if(CurrentTokenIsComma)
+                {
+                    Process(); // comma
+                    continue; // I'm going to cheat and allow a trailing comma
+                }
+
+                break;
+            }
+
+
+            ProcessSymbol(")");
+
+            //begin body
+            ProcessSymbol("{");
+
+            while(ct.Keyword == Keyword.Var)
+            {
+                Process(); // var keyword
+                ProcessTypename();
+                ProcessIdentifier("variable name");
+                while(CurrentTokenIsComma)
+                {
+                    Process();
+                    ProcessIdentifier("variable name");
+                }
+
+                ProcessSymbol(";");
+            }
+
+            //TODO: statements            
+
+            ProcessSymbol("}");
+            WriteEndElement("subroutineDec");
         }
 
-        private void Process(TokenType tokenType)
+        private void Advance()
         {
-            var ct = tokenizer.CurrentToken;
-            if(ct.TokenType == tokenType)
-            {
-                WriteXml(ct);
-            }
+            if (tokenizer.HasMoreTokens)
+                tokenizer.Advance();
             else
             {
-                throw new Exception($"Expected token of type '{tokenType}'. Current token: '{ct}'.");
-            }
-
-            tokenizer.Advance();
+                if(expectingLastToken == false)
+                    throw new Exception("Unexpected end of token stream");
+            }                
         }
 
-        private void Process(TokenType tokenType, string str)
-        {
-            var ct = tokenizer.CurrentToken;
-            if (ct.TokenType == tokenType && ct.Value == str)
-            {
-                WriteXml(ct);
-            }
-            else
-            {
-                throw new Exception($"Expected token of type '{tokenType}' with value '{str}'. Current token: '{ct}'.");
-                //throw new Exception($"Expected token of type '{tokenType}' with value '{str}' but current token is of type '{ct.TokenType}' with value '{ct.Value}'.");
-            }
-
-            tokenizer.Advance();
-        }
+        private void WriteStartElement(string element) => output.WriteLine($"<{element}>");
+        private void WriteEndElement(string element) => output.WriteLine($"</{element}>");
 
         private void WriteXml(Token token)
         {
@@ -135,14 +143,79 @@ namespace JackAnalyzer
             output.WriteLine($"<{elementName}> {token.Value} </{elementName}>");
         }
 
-        private bool CurrentTokenIsClassVarDec => tokenizer.CurrentToken.Keyword switch
+        private void Process() => Process(ct);
+        private void Process(Token token)
+        {
+            WriteXml(token);
+            Advance();
+        }
+
+        private void Process(TokenType tokenType, string? expectedValue = null, string? description = null)
+        {
+            if (ct.TokenType == tokenType && (expectedValue == null || ct.Value == expectedValue))
+            {
+                Process();
+            }
+            else
+            {
+                throw new Exception($"Expected a {description ?? ""} which should be a token of type '{tokenType}' with value '{expectedValue ?? "we dont care"}'. Current token: '{ct}'.");
+            }
+        }
+
+        private void ProcessKeyword(Keyword keyword)
+        {
+            if (ct.TokenType == TokenType.Keyword && ct.Keyword == keyword)
+            {
+                Process();
+            }
+            else
+            {
+                throw new Exception($"Expected keyword: '{keyword}'. Current token: '{ct}'.");
+            }
+        }
+
+        private void ProcessSymbol(string expectedValue)
+        {
+            Process(TokenType.Symbol, expectedValue: expectedValue);
+        }
+
+        private void ProcessIdentifier(string description)
+        {
+            Process(TokenType.Identifier, expectedValue: null, description: description);
+        }
+
+        private void ProcessTypename()
+        {
+            if (CurrentTokenIsTypename)
+            {
+                Process();
+            }
+            else
+            {
+                throw new Exception($"Expected typename (int/char/bool/classname). Current token: {tokenizer.CurrentToken}.");
+            }
+        }
+
+        private void ProcessOneOf(params Keyword[] keywords)
+        {            
+            if (keywords.Contains((Keyword)ct.Keyword))
+            {
+                Process();
+            }
+            else
+            {
+                throw new Exception($"Expected keyword to be one of: '{string.Join(",", keywords)}'. Current token: '{ct}'.");
+            }
+        }
+
+        private bool CurrentTokenIsClassVarDec => ct.Keyword switch
         {
             Keyword.Static => true,
             Keyword.Field => true,
             _ => false
         };
 
-        private bool CurrentTokenIsSubroutineDec => tokenizer.CurrentToken.Keyword switch
+        private bool CurrentTokenIsSubroutineDec => ct.Keyword switch
         {
             Keyword.Constructor => true,
             Keyword.Function => true,
@@ -150,9 +223,16 @@ namespace JackAnalyzer
             _ => false
         };
 
+        private bool CurrentTokenIsTypename => ct switch
+        {
+            Token t when t.Keyword == Keyword.Int => true,
+            Token t when t.Keyword == Keyword.Char => true,
+            Token t when t.Keyword == Keyword.Boolean => true,
+            Token t when t.TokenType == TokenType.Identifier => true,
+            _ => false
+        };
 
-
-
+        private bool CurrentTokenIsComma => ct.TokenType == TokenType.Symbol && ct.Value == ",";
 
     }
 }
