@@ -6,6 +6,10 @@
     },
     "Jack Analyzer - Local": {
       "commandName": "Project"
+    },
+    "JackAnalyzer-ELSquare": {
+      "commandName": "Project",
+      "workingDirectory": "D:\\code\\nand2tetris\\projects\\10\\ExpressionLessSquare"
     }
   }
 }

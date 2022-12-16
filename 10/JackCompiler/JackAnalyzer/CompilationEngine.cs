@@ -117,10 +117,82 @@ namespace JackAnalyzer
                 ProcessSymbol(";");
             }
 
+            CompileStatements();
+            
             //TODO: statements            
 
             ProcessSymbol("}");
             WriteEndElement("subroutineDec");
+        }
+
+        public void CompileStatements()
+        {
+            while (CurrentTokenIsStatement)
+            {
+                switch(ct.Keyword)
+                {
+                    case Keyword.Let:
+                        Process(); // let keyword
+                        ProcessIdentifier("variable name");
+                        if(ct.TokenType == TokenType.Symbol && ct.Value == "[")
+                        {
+                            Process(); // the opening bracket
+                            ProcessExpression();                            
+                            ProcessSymbol("]");
+                        }
+
+                        ProcessSymbol("=");
+                        ProcessExpression();
+                        ProcessSymbol(";");
+                        break;
+                    case Keyword.If:
+                        Process(); // if keyword
+                        ProcessSymbol("(");
+                        ProcessExpression();
+                        ProcessSymbol(")");
+                        ProcessSymbol("{");
+                        CompileStatements();
+                        ProcessSymbol("}");
+
+                        if(ct.Keyword == Keyword.Else)
+                        {
+                            Process(); // else keyword
+                            ProcessSymbol("{");
+                            CompileStatements();
+                            ProcessSymbol("}");
+                        }
+                        break;
+                    case Keyword.While:
+                        Process(); // while keyword
+                        ProcessSymbol("(");
+                        ProcessExpression();
+                        ProcessSymbol(")");
+                        ProcessSymbol("{");
+                        CompileStatements();
+                        ProcessSymbol("}");
+                        break;
+                    case Keyword.Do:
+                        Process(); // do keyword
+                        ProcessSubroutineCall();
+                        ProcessSymbol(";");
+                        break;
+                    case Keyword.Return:
+                        Process(); // return keyword
+                        if(ct.TokenType == TokenType.Symbol && ct.Value == ";")
+                        {
+                            ProcessSymbol(";");
+                        }
+                        else
+                        {
+                            ProcessExpression();
+                            ProcessSymbol(";");
+                        }
+                                                
+                        break;
+                    default:
+                        throw new Exception("unreachable");
+                }
+            }
         }
 
         private void Advance()
@@ -152,13 +224,18 @@ namespace JackAnalyzer
 
         private void Process(TokenType tokenType, string? expectedValue = null, string? description = null)
         {
-            if (ct.TokenType == tokenType && (expectedValue == null || ct.Value == expectedValue))
+            Process(ct, tokenType, expectedValue, description);
+        }
+
+        private void Process(Token theToken, TokenType tokenType, string? expectedValue = null, string? description = null)
+        {
+            if (theToken.TokenType == tokenType && (expectedValue == null || theToken.Value == expectedValue))
             {
                 Process();
             }
             else
             {
-                throw new Exception($"Expected a {description ?? ""} which should be a token of type '{tokenType}' with value '{expectedValue ?? "we dont care"}'. Current token: '{ct}'.");
+                throw new Exception($"Expected a {description ?? ""} which should be a token of type '{tokenType}' with value '{expectedValue ?? "we dont care"}'. Current token: '{theToken}'.");
             }
         }
 
@@ -208,6 +285,73 @@ namespace JackAnalyzer
             }
         }
 
+        private void ProcessExpression()
+        {
+            Process();
+            // TODO
+        }
+
+        private void ProcessSubroutineCall()
+        {
+            var firstToken = ct;
+            Advance();
+            
+            if(ct.TokenType == TokenType.Symbol && ct.Value == ".")
+            {
+                if(firstToken.TokenType == TokenType.Identifier)
+                {
+                    WriteXml(firstToken); // class name or variable name
+                    ProcessSymbol(".");
+                    ProcessIdentifier("subroutine name");
+                    ProcessParameterList();
+                }
+                else
+                {
+                    throw new Exception("In a subroutine call, only an identifier can be proceeded by a '.'");
+                }
+                
+            }
+            else if (ct.TokenType == TokenType.Symbol && ct.Value == "(")
+            {
+                if (firstToken.TokenType == TokenType.Identifier)
+                {
+                    WriteXml(firstToken); // subroutine name
+                    ProcessParameterList();
+                }
+                else
+                {
+                    throw new Exception("Expected an identifier proceeding the parameter list for a subroutine call");
+                }
+            }
+            else
+            {
+                throw new Exception("not a subroutine call");
+            }
+
+
+        }
+
+        private void ProcessParameterList()
+        {
+            ProcessSymbol("(");
+
+            if (ct.TokenType == TokenType.Symbol && ct.Value == ")")
+            {
+                ProcessSymbol(")");
+            }
+            else
+            {
+                ProcessExpression();
+                while(CurrentTokenIsComma)
+                {
+                    ProcessSymbol(",");
+                    ProcessExpression();
+                }
+                ProcessSymbol(")");
+            }
+        }
+        
+
         private bool CurrentTokenIsClassVarDec => ct.Keyword switch
         {
             Keyword.Static => true,
@@ -229,6 +373,16 @@ namespace JackAnalyzer
             Token t when t.Keyword == Keyword.Char => true,
             Token t when t.Keyword == Keyword.Boolean => true,
             Token t when t.TokenType == TokenType.Identifier => true,
+            _ => false
+        };
+
+        private bool CurrentTokenIsStatement => ct switch
+        {
+            Token t when t.Keyword == Keyword.Let => true,
+            Token t when t.Keyword == Keyword.If => true,
+            Token t when t.Keyword == Keyword.While => true,
+            Token t when t.Keyword == Keyword.Do => true,
+            Token t when t.Keyword == Keyword.Return => true,
             _ => false
         };
 
