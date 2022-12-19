@@ -137,18 +137,18 @@ namespace JackAnalyzer
                         if(ct.TokenType == TokenType.Symbol && ct.Value == "[")
                         {
                             Process(); // the opening bracket
-                            ProcessExpression();                            
+                            CompileExpression();                            
                             ProcessSymbol("]");
                         }
 
                         ProcessSymbol("=");
-                        ProcessExpression();
+                        CompileExpression();
                         ProcessSymbol(";");
                         break;
                     case Keyword.If:
                         Process(); // if keyword
                         ProcessSymbol("(");
-                        ProcessExpression();
+                        CompileExpression();
                         ProcessSymbol(")");
                         ProcessSymbol("{");
                         CompileStatements();
@@ -165,7 +165,7 @@ namespace JackAnalyzer
                     case Keyword.While:
                         Process(); // while keyword
                         ProcessSymbol("(");
-                        ProcessExpression();
+                        CompileExpression();
                         ProcessSymbol(")");
                         ProcessSymbol("{");
                         CompileStatements();
@@ -173,7 +173,8 @@ namespace JackAnalyzer
                         break;
                     case Keyword.Do:
                         Process(); // do keyword
-                        ProcessSubroutineCall();
+                        //ProcessSubroutineCall();
+                        CompileTerm();
                         ProcessSymbol(";");
                         break;
                     case Keyword.Return:
@@ -184,7 +185,7 @@ namespace JackAnalyzer
                         }
                         else
                         {
-                            ProcessExpression();
+                            CompileExpression();
                             ProcessSymbol(";");
                         }
                                                 
@@ -192,6 +193,81 @@ namespace JackAnalyzer
                     default:
                         throw new Exception("unreachable");
                 }
+            }
+        }
+
+        public void CompileTerm()
+        {
+            if (ct.TokenType == TokenType.IntegerConstant)
+            {
+                Process();
+            }
+            else if (ct.TokenType == TokenType.StringConstant)
+            {
+                Process();
+            }
+            else if (CurrentTokenIsKeywordConstant)
+            {
+                Process();
+            }
+            else if (CurrentTokenIsOpenParen)
+            {
+                ProcessSymbol("(");
+                CompileExpression();
+                ProcessSymbol(")");
+            }
+            else if (CurrentTokenIsUnaryOp)
+            {
+                Process();
+                CompileTerm();
+            }
+            else if (ct.TokenType == TokenType.Identifier)
+            {
+                var identifier = ct;
+                Advance();
+
+                if (ct.TokenType == TokenType.Symbol)
+                {
+                    switch(ct.Value)
+                    {
+                        case "(":
+                            WriteXml(identifier); // subroutine name
+                            ProcessParameterList();
+                            break;
+                        case "[":
+                            WriteXml(identifier); // variable name
+                            ProcessSymbol("[");
+                            CompileExpression();
+                            ProcessSymbol("]");
+                            break;
+                        case ".":
+                            WriteXml(identifier); // class name or variable name
+                            ProcessSymbol(".");
+                            ProcessIdentifier("subroutine name");
+                            ProcessParameterList();
+                            break;
+                        default:
+                            WriteXml(identifier); // variable name
+                            break;
+                    }
+                }
+            }
+            else
+            {
+                throw new Exception($"Expected a term, got '{ct}'.");
+            }
+
+
+            
+        }
+
+        private void CompileExpression()
+        {
+            CompileTerm();
+            while (CurrentTokenIsOp)
+            {
+                Process(); // the operator
+                CompileTerm();
             }
         }
 
@@ -285,51 +361,45 @@ namespace JackAnalyzer
             }
         }
 
-        private void ProcessExpression()
-        {
-            Process();
-            // TODO
-        }
-
-        private void ProcessSubroutineCall()
-        {
-            var firstToken = ct;
-            Advance();
+        //private void ProcessSubroutineCall()
+        //{
+        //    var firstToken = ct;
+        //    Advance();
             
-            if(ct.TokenType == TokenType.Symbol && ct.Value == ".")
-            {
-                if(firstToken.TokenType == TokenType.Identifier)
-                {
-                    WriteXml(firstToken); // class name or variable name
-                    ProcessSymbol(".");
-                    ProcessIdentifier("subroutine name");
-                    ProcessParameterList();
-                }
-                else
-                {
-                    throw new Exception("In a subroutine call, only an identifier can be proceeded by a '.'");
-                }
+        //    if(ct.TokenType == TokenType.Symbol && ct.Value == ".")
+        //    {
+        //        if(firstToken.TokenType == TokenType.Identifier)
+        //        {
+        //            WriteXml(firstToken); // class name or variable name
+        //            ProcessSymbol(".");
+        //            ProcessIdentifier("subroutine name");
+        //            ProcessParameterList();
+        //        }
+        //        else
+        //        {
+        //            throw new Exception("In a subroutine call, only an identifier can be proceeded by a '.'");
+        //        }
                 
-            }
-            else if (ct.TokenType == TokenType.Symbol && ct.Value == "(")
-            {
-                if (firstToken.TokenType == TokenType.Identifier)
-                {
-                    WriteXml(firstToken); // subroutine name
-                    ProcessParameterList();
-                }
-                else
-                {
-                    throw new Exception("Expected an identifier proceeding the parameter list for a subroutine call");
-                }
-            }
-            else
-            {
-                throw new Exception("not a subroutine call");
-            }
+        //    }
+        //    else if (ct.TokenType == TokenType.Symbol && ct.Value == "(")
+        //    {
+        //        if (firstToken.TokenType == TokenType.Identifier)
+        //        {
+        //            WriteXml(firstToken); // subroutine name
+        //            ProcessParameterList();
+        //        }
+        //        else
+        //        {
+        //            throw new Exception("Expected an identifier proceeding the parameter list for a subroutine call");
+        //        }
+        //    }
+        //    else
+        //    {
+        //        throw new Exception("not a subroutine call");
+        //    }
 
 
-        }
+        //}
 
         private void ProcessParameterList()
         {
@@ -341,11 +411,11 @@ namespace JackAnalyzer
             }
             else
             {
-                ProcessExpression();
+                CompileExpression();
                 while(CurrentTokenIsComma)
                 {
                     ProcessSymbol(",");
-                    ProcessExpression();
+                    CompileExpression();
                 }
                 ProcessSymbol(")");
             }
@@ -386,7 +456,23 @@ namespace JackAnalyzer
             _ => false
         };
 
+        private bool CurrentTokenIsKeywordConstant => ct.TokenType == TokenType.Keyword && ct.Keyword switch
+        {
+            Keyword.True => true,
+            Keyword.False => true,
+            Keyword.This => true,
+            Keyword.Null => true,
+            _ => false
+        };
+
+        private bool CurrentTokenIsUnaryOp => ct.TokenType == TokenType.Symbol && (ct.Value == "-" || ct.Value == "~");
+
         private bool CurrentTokenIsComma => ct.TokenType == TokenType.Symbol && ct.Value == ",";
+        private bool CurrentTokenIsOpenParen => ct.TokenType == TokenType.Symbol && ct.Value == "(";
+
+        private static readonly List<string> BinaryOperators = new List<string> { "+", "-", "*", "/", "&", "|", "<", ">", "=" };
+        private bool CurrentTokenIsOp => ct.TokenType == TokenType.Symbol && BinaryOperators.Contains(ct.Value);
+        
 
     }
 }
