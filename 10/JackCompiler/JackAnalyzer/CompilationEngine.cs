@@ -83,28 +83,15 @@ namespace JackAnalyzer
 
             ProcessIdentifier(description: "subroutine name");
             ProcessSymbol("(");
-
-            while(CurrentTokenIsTypename)
-            {
-                ProcessTypename();
-                ProcessIdentifier(description: "variable name");
-                if(CurrentTokenIsComma)
-                {
-                    Process(); // comma
-                    continue; // I'm going to cheat and allow a trailing comma
-                }
-
-                break;
-            }
-
-
+            CompileParameterList();
             ProcessSymbol(")");
-
-            //begin body
+            
+            WriteStartElement("subroutineBody");
             ProcessSymbol("{");
 
             while(ct.Keyword == Keyword.Var)
             {
+                WriteStartElement("varDec");
                 Process(); // var keyword
                 ProcessTypename();
                 ProcessIdentifier("variable name");
@@ -115,23 +102,26 @@ namespace JackAnalyzer
                 }
 
                 ProcessSymbol(";");
+                WriteEndElement("varDec");
             }
 
-            CompileStatements();
-            
-            //TODO: statements            
+            CompileStatements();                       
 
             ProcessSymbol("}");
+            WriteEndElement("subroutineBody");
             WriteEndElement("subroutineDec");
         }
 
         public void CompileStatements()
         {
+            WriteStartElement("statements");
+            
             while (CurrentTokenIsStatement)
             {
                 switch(ct.Keyword)
                 {
                     case Keyword.Let:
+                        WriteStartElement("letStatement");
                         Process(); // let keyword
                         ProcessIdentifier("variable name");
                         if(ct.TokenType == TokenType.Symbol && ct.Value == "[")
@@ -144,8 +134,10 @@ namespace JackAnalyzer
                         ProcessSymbol("=");
                         CompileExpression();
                         ProcessSymbol(";");
+                        WriteEndElement("letStatement");
                         break;
                     case Keyword.If:
+                        WriteStartElement("ifStatement");
                         Process(); // if keyword
                         ProcessSymbol("(");
                         CompileExpression();
@@ -161,8 +153,10 @@ namespace JackAnalyzer
                             CompileStatements();
                             ProcessSymbol("}");
                         }
+                        WriteEndElement("ifStatement");
                         break;
                     case Keyword.While:
+                        WriteStartElement("whileStatement");
                         Process(); // while keyword
                         ProcessSymbol("(");
                         CompileExpression();
@@ -170,14 +164,18 @@ namespace JackAnalyzer
                         ProcessSymbol("{");
                         CompileStatements();
                         ProcessSymbol("}");
+                        WriteEndElement("whileStatement");
                         break;
                     case Keyword.Do:
+                        WriteStartElement("doStatement");
                         Process(); // do keyword
                         //ProcessSubroutineCall();
-                        CompileTerm();
+                        CompileTerm(isDo:true);
                         ProcessSymbol(";");
+                        WriteEndElement("doStatement");
                         break;
                     case Keyword.Return:
+                        WriteStartElement("returnStatement");
                         Process(); // return keyword
                         if(ct.TokenType == TokenType.Symbol && ct.Value == ";")
                         {
@@ -188,16 +186,23 @@ namespace JackAnalyzer
                             CompileExpression();
                             ProcessSymbol(";");
                         }
-                                                
+                        WriteEndElement("returnStatement");
                         break;
                     default:
                         throw new Exception("unreachable");
                 }
             }
+
+            WriteEndElement("statements");
         }
 
-        public void CompileTerm()
+        public void CompileTerm(bool isDo = false)
         {
+            if (!isDo)
+            {
+                WriteStartElement("term");
+            }
+
             if (ct.TokenType == TokenType.IntegerConstant)
             {
                 Process();
@@ -232,7 +237,9 @@ namespace JackAnalyzer
                     {
                         case "(":
                             WriteXml(identifier); // subroutine name
-                            ProcessParameterList();
+                            ProcessSymbol("(");
+                            CompileExpressionList();
+                            ProcessSymbol(")");                            
                             break;
                         case "[":
                             WriteXml(identifier); // variable name
@@ -244,7 +251,9 @@ namespace JackAnalyzer
                             WriteXml(identifier); // class name or variable name
                             ProcessSymbol(".");
                             ProcessIdentifier("subroutine name");
-                            ProcessParameterList();
+                            ProcessSymbol("(");
+                            CompileExpressionList();
+                            ProcessSymbol(")");
                             break;
                         default:
                             WriteXml(identifier); // variable name
@@ -257,18 +266,59 @@ namespace JackAnalyzer
                 throw new Exception($"Expected a term, got '{ct}'.");
             }
 
-
-            
+            if (!isDo)
+            {
+                WriteEndElement("term");
+            }
         }
 
         private void CompileExpression()
         {
+            WriteStartElement("expression");
+
             CompileTerm();
             while (CurrentTokenIsOp)
             {
                 Process(); // the operator
                 CompileTerm();
             }
+
+            WriteEndElement("expression");
+        }
+
+        private void CompileParameterList()
+        {
+            WriteStartElement("parameterList");
+            while (CurrentTokenIsTypename)
+            {
+                ProcessTypename();
+                ProcessIdentifier(description: "variable name");
+                if (CurrentTokenIsComma)
+                {
+                    Process(); // comma
+                    continue; // I'm going to cheat and allow a trailing comma
+                }
+
+                break;
+            }
+            WriteEndElement("parameterList");
+        }
+
+        private void CompileExpressionList()
+        {            
+            WriteStartElement("expressionList");
+
+            if (ct.TokenType != TokenType.Symbol || ct.Value != ")")
+            { 
+                CompileExpression();
+                while (CurrentTokenIsComma)
+                {
+                    ProcessSymbol(",");
+                    CompileExpression();
+                }                
+            }
+
+            WriteEndElement("expressionList");
         }
 
         private void Advance()
@@ -287,7 +337,8 @@ namespace JackAnalyzer
 
         private void WriteXml(Token token)
         {
-            string elementName = token.TokenType.ToString().ToLower();
+            string elementName = token.TokenType.ToString();
+            elementName = elementName.Substring(0,1).ToLower() + elementName.Substring(1);
             output.WriteLine($"<{elementName}> {token.Value} </{elementName}>");
         }
 
@@ -404,6 +455,7 @@ namespace JackAnalyzer
         private void ProcessParameterList()
         {
             ProcessSymbol("(");
+            WriteStartElement("parameterList");
 
             if (ct.TokenType == TokenType.Symbol && ct.Value == ")")
             {
