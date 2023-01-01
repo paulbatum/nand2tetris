@@ -339,7 +339,20 @@ namespace JackAnalyzer
         {
             string elementName = token.TokenType.ToString();
             elementName = elementName.Substring(0,1).ToLower() + elementName.Substring(1);
-            output.WriteLine($"<{elementName}> {token.Value} </{elementName}>");
+            string outVal = token.Value switch
+            {
+                string s when s == ">" => "&gt;",
+                string s when s == "<" => "&lt;",
+                string s when s == "&" => "&amp;",
+                string s => s
+            };
+
+            WriteXmlElement(elementName, outVal);
+        }
+
+        private void WriteXmlElement(string elementName, string elementValue)
+        {
+            output.WriteLine($"<{elementName}> {elementValue} </{elementName}>");
         }
 
         private void Process() => Process(ct);
