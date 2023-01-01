@@ -1,6 +1,10 @@
 <class>
 <keyword> class </keyword>
-<identifier> Main </identifier>
+<identifier>
+<name> Main </name>
+<category> class </category>
+<usage> declared </usage>
+</identifier>
 <symbol> { </symbol>
 <classVarDec>
 <keyword> static </keyword>

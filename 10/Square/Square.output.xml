@@ -1,6 +1,10 @@
 <class>
 <keyword> class </keyword>
-<identifier> Square </identifier>
+<identifier>
+<name> Square </name>
+<category> class </category>
+<usage> declared </usage>
+</identifier>
 <symbol> { </symbol>
 <classVarDec>
 <keyword> field </keyword>

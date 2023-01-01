@@ -1,10 +1,18 @@
 <class>
 <keyword> class </keyword>
-<identifier> SquareGame </identifier>
+<identifier>
+<name> SquareGame </name>
+<category> class </category>
+<usage> declared </usage>
+</identifier>
 <symbol> { </symbol>
 <classVarDec>
 <keyword> field </keyword>
-<identifier> Square </identifier>
+<identifier>
+<name> Square </name>
+<category> class </category>
+<usage> used </usage>
+</identifier>
 <identifier> square </identifier>
 <symbol> ; </symbol>
 </classVarDec>

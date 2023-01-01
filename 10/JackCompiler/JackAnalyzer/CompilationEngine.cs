@@ -11,6 +11,8 @@ namespace JackAnalyzer
         private JackTokenizer tokenizer;
         private StreamWriter output;
         private bool expectingLastToken = false;
+        private SymbolTable classTable = new SymbolTable();
+        private SymbolTable subroutineTable = new SymbolTable();
 
         public CompilationEngine(StreamReader input, StreamWriter output)
         {
@@ -27,7 +29,7 @@ namespace JackAnalyzer
 
             WriteStartElement("class");
             ProcessKeyword(Keyword.Class);
-            ProcessIdentifier(description: "class name");
+            ProcessIdentifier("class", "declared", "class name");
             ProcessSymbol("{");
           
             while (CurrentTokenIsClassVarDec)
@@ -50,10 +52,20 @@ namespace JackAnalyzer
             WriteStartElement("classVarDec");
             ProcessOneOf(Keyword.Static, Keyword.Field);
 
-            if (CurrentTokenIsTypename == false)
+            if (CurrentTokenIsBuiltInType)
+            {
+                Process(); //int/char/bool
+            }
+            else if (ct.TokenType == TokenType.Identifier)
+            {
+                ProcessIdentifier("class", "used", "typename");
+            }
+            else
+            {
                 throw new Exception($"Expected typename (int/char/bool/classname). Current token: {tokenizer.CurrentToken}.");
+            }
 
-            Process(); // typename
+            
             ProcessIdentifier(description: "variable name");
 
             while(CurrentTokenIsComma)
@@ -339,6 +351,7 @@ namespace JackAnalyzer
         {
             string elementName = token.TokenType.ToString();
             elementName = elementName.Substring(0,1).ToLower() + elementName.Substring(1);
+
             string outVal = token.Value switch
             {
                 string s when s == ">" => "&gt;",
@@ -395,6 +408,22 @@ namespace JackAnalyzer
         {
             Process(TokenType.Symbol, expectedValue: expectedValue);
         }
+
+        private void ProcessIdentifier(string category, string usage, string description)
+        {
+            if (ct.TokenType != TokenType.Identifier)
+                throw new Exception($"Expected identifier for {description}. Current token: '{ct}'.");
+
+            WriteStartElement("identifier");
+
+            WriteXmlElement("name", ct.Value);
+            WriteXmlElement("category", category);
+            WriteXmlElement("usage", usage);
+
+            WriteEndElement("identifier");
+
+            Advance();
+        }        
 
         private void ProcessIdentifier(string description)
         {
@@ -502,14 +531,15 @@ namespace JackAnalyzer
             _ => false
         };
 
-        private bool CurrentTokenIsTypename => ct switch
+        private bool CurrentTokenIsBuiltInType => ct.Keyword switch
         {
-            Token t when t.Keyword == Keyword.Int => true,
-            Token t when t.Keyword == Keyword.Char => true,
-            Token t when t.Keyword == Keyword.Boolean => true,
-            Token t when t.TokenType == TokenType.Identifier => true,
+            Keyword.Int => true,
+            Keyword.Char => true,
+            Keyword.Boolean => true,
             _ => false
         };
+
+        private bool CurrentTokenIsTypename => CurrentTokenIsBuiltInType || ct.TokenType == TokenType.Identifier;
 
         private bool CurrentTokenIsStatement => ct switch
         {
