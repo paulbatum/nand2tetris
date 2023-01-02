@@ -9,31 +9,69 @@
 <classVarDec>
 <keyword> field </keyword>
 <keyword> int </keyword>
-<identifier> x </identifier>
+<identifier>
+<name> x </name>
+<category> field </category>
+<usage> declared </usage>
+<index> 0 </index>
+</identifier>
 <symbol> , </symbol>
-<identifier> y </identifier>
+<identifier>
+<name> y </name>
+<category> field </category>
+<usage> declared </usage>
+<index> 1 </index>
+</identifier>
 <symbol> ; </symbol>
 </classVarDec>
 <classVarDec>
 <keyword> field </keyword>
 <keyword> int </keyword>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> declared </usage>
+<index> 2 </index>
+</identifier>
 <symbol> ; </symbol>
 </classVarDec>
 <subroutineDec>
 <keyword> constructor </keyword>
-<identifier> Square </identifier>
-<identifier> new </identifier>
+<identifier>
+<name> Square </name>
+<category> class </category>
+<usage> used </usage>
+</identifier>
+<identifier>
+<name> new </name>
+<category> subroutine </category>
+<usage> declared </usage>
+</identifier>
 <symbol> ( </symbol>
 <parameterList>
 <keyword> int </keyword>
-<identifier> Ax </identifier>
+<identifier>
+<name> Ax </name>
+<category> arg </category>
+<usage> declared </usage>
+<index> 0 </index>
+</identifier>
 <symbol> , </symbol>
 <keyword> int </keyword>
-<identifier> Ay </identifier>
+<identifier>
+<name> Ay </name>
+<category> arg </category>
+<usage> declared </usage>
+<index> 1 </index>
+</identifier>
 <symbol> , </symbol>
 <keyword> int </keyword>
-<identifier> Asize </identifier>
+<identifier>
+<name> Asize </name>
+<category> arg </category>
+<usage> declared </usage>
+<index> 2 </index>
+</identifier>
 </parameterList>
 <symbol> ) </symbol>
 <subroutineBody>
@@ -41,40 +79,74 @@
 <statements>
 <letStatement>
 <keyword> let </keyword>
-<identifier> x </identifier>
+<identifier>
+<name> x </name>
+<category> field </category>
+<usage> used </usage>
+<index> 0 </index>
+</identifier>
 <symbol> = </symbol>
 <expression>
 <term>
-<identifier> Ax </identifier>
+<identifier>
+<name> Ax </name>
+<category> arg </category>
+<usage> used </usage>
+<index> 0 </index>
+</identifier>
 </term>
 </expression>
 <symbol> ; </symbol>
 </letStatement>
 <letStatement>
 <keyword> let </keyword>
-<identifier> y </identifier>
+<identifier>
+<name> y </name>
+<category> field </category>
+<usage> used </usage>
+<index> 1 </index>
+</identifier>
 <symbol> = </symbol>
 <expression>
 <term>
-<identifier> Ay </identifier>
+<identifier>
+<name> Ay </name>
+<category> arg </category>
+<usage> used </usage>
+<index> 1 </index>
+</identifier>
 </term>
 </expression>
 <symbol> ; </symbol>
 </letStatement>
 <letStatement>
 <keyword> let </keyword>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 <symbol> = </symbol>
 <expression>
 <term>
-<identifier> Asize </identifier>
+<identifier>
+<name> Asize </name>
+<category> arg </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 </term>
 </expression>
 <symbol> ; </symbol>
 </letStatement>
 <doStatement>
 <keyword> do </keyword>
-<identifier> draw </identifier>
+<identifier>
+<name> draw </name>
+<category> subroutine </category>
+<usage> used </usage>
+</identifier>
 <symbol> ( </symbol>
 <expressionList>
 </expressionList>
@@ -97,7 +169,11 @@
 <subroutineDec>
 <keyword> method </keyword>
 <keyword> void </keyword>
-<identifier> dispose </identifier>
+<identifier>
+<name> dispose </name>
+<category> subroutine </category>
+<usage> declared </usage>
+</identifier>
 <symbol> ( </symbol>
 <parameterList>
 </parameterList>
@@ -107,9 +183,17 @@
 <statements>
 <doStatement>
 <keyword> do </keyword>
-<identifier> Memory </identifier>
+<identifier>
+<name> Memory </name>
+<category> class </category>
+<usage> used </usage>
+</identifier>
 <symbol> . </symbol>
-<identifier> deAlloc </identifier>
+<identifier>
+<name> deAlloc </name>
+<category> subroutine </category>
+<usage> used </usage>
+</identifier>
 <symbol> ( </symbol>
 <expressionList>
 <expression>
@@ -132,7 +216,11 @@
 <subroutineDec>
 <keyword> method </keyword>
 <keyword> void </keyword>
-<identifier> draw </identifier>
+<identifier>
+<name> draw </name>
+<category> subroutine </category>
+<usage> declared </usage>
+</identifier>
 <symbol> ( </symbol>
 <parameterList>
 </parameterList>
@@ -142,9 +230,17 @@
 <statements>
 <doStatement>
 <keyword> do </keyword>
-<identifier> Screen </identifier>
+<identifier>
+<name> Screen </name>
+<category> class </category>
+<usage> used </usage>
+</identifier>
 <symbol> . </symbol>
-<identifier> setColor </identifier>
+<identifier>
+<name> setColor </name>
+<category> subroutine </category>
+<usage> used </usage>
+</identifier>
 <symbol> ( </symbol>
 <expressionList>
 <expression>
@@ -158,40 +254,78 @@
 </doStatement>
 <doStatement>
 <keyword> do </keyword>
-<identifier> Screen </identifier>
+<identifier>
+<name> Screen </name>
+<category> class </category>
+<usage> used </usage>
+</identifier>
 <symbol> . </symbol>
-<identifier> drawRectangle </identifier>
+<identifier>
+<name> drawRectangle </name>
+<category> subroutine </category>
+<usage> used </usage>
+</identifier>
 <symbol> ( </symbol>
 <expressionList>
 <expression>
 <term>
-<identifier> x </identifier>
+<identifier>
+<name> x </name>
+<category> field </category>
+<usage> used </usage>
+<index> 0 </index>
+</identifier>
 </term>
 </expression>
 <symbol> , </symbol>
 <expression>
 <term>
-<identifier> y </identifier>
+<identifier>
+<name> y </name>
+<category> field </category>
+<usage> used </usage>
+<index> 1 </index>
+</identifier>
 </term>
 </expression>
 <symbol> , </symbol>
 <expression>
 <term>
-<identifier> x </identifier>
+<identifier>
+<name> x </name>
+<category> field </category>
+<usage> used </usage>
+<index> 0 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 </term>
 </expression>
 <symbol> , </symbol>
 <expression>
 <term>
-<identifier> y </identifier>
+<identifier>
+<name> y </name>
+<category> field </category>
+<usage> used </usage>
+<index> 1 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 </term>
 </expression>
 </expressionList>
@@ -209,7 +343,11 @@
 <subroutineDec>
 <keyword> method </keyword>
 <keyword> void </keyword>
-<identifier> erase </identifier>
+<identifier>
+<name> erase </name>
+<category> subroutine </category>
+<usage> declared </usage>
+</identifier>
 <symbol> ( </symbol>
 <parameterList>
 </parameterList>
@@ -219,9 +357,17 @@
 <statements>
 <doStatement>
 <keyword> do </keyword>
-<identifier> Screen </identifier>
+<identifier>
+<name> Screen </name>
+<category> class </category>
+<usage> used </usage>
+</identifier>
 <symbol> . </symbol>
-<identifier> setColor </identifier>
+<identifier>
+<name> setColor </name>
+<category> subroutine </category>
+<usage> used </usage>
+</identifier>
 <symbol> ( </symbol>
 <expressionList>
 <expression>
@@ -235,40 +381,78 @@
 </doStatement>
 <doStatement>
 <keyword> do </keyword>
-<identifier> Screen </identifier>
+<identifier>
+<name> Screen </name>
+<category> class </category>
+<usage> used </usage>
+</identifier>
 <symbol> . </symbol>
-<identifier> drawRectangle </identifier>
+<identifier>
+<name> drawRectangle </name>
+<category> subroutine </category>
+<usage> used </usage>
+</identifier>
 <symbol> ( </symbol>
 <expressionList>
 <expression>
 <term>
-<identifier> x </identifier>
+<identifier>
+<name> x </name>
+<category> field </category>
+<usage> used </usage>
+<index> 0 </index>
+</identifier>
 </term>
 </expression>
 <symbol> , </symbol>
 <expression>
 <term>
-<identifier> y </identifier>
+<identifier>
+<name> y </name>
+<category> field </category>
+<usage> used </usage>
+<index> 1 </index>
+</identifier>
 </term>
 </expression>
 <symbol> , </symbol>
 <expression>
 <term>
-<identifier> x </identifier>
+<identifier>
+<name> x </name>
+<category> field </category>
+<usage> used </usage>
+<index> 0 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 </term>
 </expression>
 <symbol> , </symbol>
 <expression>
 <term>
-<identifier> y </identifier>
+<identifier>
+<name> y </name>
+<category> field </category>
+<usage> used </usage>
+<index> 1 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 </term>
 </expression>
 </expressionList>
@@ -286,7 +470,11 @@
 <subroutineDec>
 <keyword> method </keyword>
 <keyword> void </keyword>
-<identifier> incSize </identifier>
+<identifier>
+<name> incSize </name>
+<category> subroutine </category>
+<usage> declared </usage>
+</identifier>
 <symbol> ( </symbol>
 <parameterList>
 </parameterList>
@@ -305,11 +493,21 @@
 <symbol> ( </symbol>
 <expression>
 <term>
-<identifier> y </identifier>
+<identifier>
+<name> y </name>
+<category> field </category>
+<usage> used </usage>
+<index> 1 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 </term>
 </expression>
 <symbol> ) </symbol>
@@ -329,11 +527,21 @@
 <symbol> ( </symbol>
 <expression>
 <term>
-<identifier> x </identifier>
+<identifier>
+<name> x </name>
+<category> field </category>
+<usage> used </usage>
+<index> 0 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 </term>
 </expression>
 <symbol> ) </symbol>
@@ -351,7 +559,11 @@
 <statements>
 <doStatement>
 <keyword> do </keyword>
-<identifier> erase </identifier>
+<identifier>
+<name> erase </name>
+<category> subroutine </category>
+<usage> used </usage>
+</identifier>
 <symbol> ( </symbol>
 <expressionList>
 </expressionList>
@@ -360,11 +572,21 @@
 </doStatement>
 <letStatement>
 <keyword> let </keyword>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 <symbol> = </symbol>
 <expression>
 <term>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
@@ -375,7 +597,11 @@
 </letStatement>
 <doStatement>
 <keyword> do </keyword>
-<identifier> draw </identifier>
+<identifier>
+<name> draw </name>
+<category> subroutine </category>
+<usage> used </usage>
+</identifier>
 <symbol> ( </symbol>
 <expressionList>
 </expressionList>
@@ -396,7 +622,11 @@
 <subroutineDec>
 <keyword> method </keyword>
 <keyword> void </keyword>
-<identifier> decSize </identifier>
+<identifier>
+<name> decSize </name>
+<category> subroutine </category>
+<usage> declared </usage>
+</identifier>
 <symbol> ( </symbol>
 <parameterList>
 </parameterList>
@@ -409,7 +639,12 @@
 <symbol> ( </symbol>
 <expression>
 <term>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 </term>
 <symbol> &gt; </symbol>
 <term>
@@ -421,7 +656,11 @@
 <statements>
 <doStatement>
 <keyword> do </keyword>
-<identifier> erase </identifier>
+<identifier>
+<name> erase </name>
+<category> subroutine </category>
+<usage> used </usage>
+</identifier>
 <symbol> ( </symbol>
 <expressionList>
 </expressionList>
@@ -430,11 +669,21 @@
 </doStatement>
 <letStatement>
 <keyword> let </keyword>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 <symbol> = </symbol>
 <expression>
 <term>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 </term>
 <symbol> - </symbol>
 <term>
@@ -445,7 +694,11 @@
 </letStatement>
 <doStatement>
 <keyword> do </keyword>
-<identifier> draw </identifier>
+<identifier>
+<name> draw </name>
+<category> subroutine </category>
+<usage> used </usage>
+</identifier>
 <symbol> ( </symbol>
 <expressionList>
 </expressionList>
@@ -466,7 +719,11 @@
 <subroutineDec>
 <keyword> method </keyword>
 <keyword> void </keyword>
-<identifier> moveUp </identifier>
+<identifier>
+<name> moveUp </name>
+<category> subroutine </category>
+<usage> declared </usage>
+</identifier>
 <symbol> ( </symbol>
 <parameterList>
 </parameterList>
@@ -479,7 +736,12 @@
 <symbol> ( </symbol>
 <expression>
 <term>
-<identifier> y </identifier>
+<identifier>
+<name> y </name>
+<category> field </category>
+<usage> used </usage>
+<index> 1 </index>
+</identifier>
 </term>
 <symbol> &gt; </symbol>
 <term>
@@ -491,9 +753,17 @@
 <statements>
 <doStatement>
 <keyword> do </keyword>
-<identifier> Screen </identifier>
+<identifier>
+<name> Screen </name>
+<category> class </category>
+<usage> used </usage>
+</identifier>
 <symbol> . </symbol>
-<identifier> setColor </identifier>
+<identifier>
+<name> setColor </name>
+<category> subroutine </category>
+<usage> used </usage>
+</identifier>
 <symbol> ( </symbol>
 <expressionList>
 <expression>
@@ -507,14 +777,27 @@
 </doStatement>
 <doStatement>
 <keyword> do </keyword>
-<identifier> Screen </identifier>
+<identifier>
+<name> Screen </name>
+<category> class </category>
+<usage> used </usage>
+</identifier>
 <symbol> . </symbol>
-<identifier> drawRectangle </identifier>
+<identifier>
+<name> drawRectangle </name>
+<category> subroutine </category>
+<usage> used </usage>
+</identifier>
 <symbol> ( </symbol>
 <expressionList>
 <expression>
 <term>
-<identifier> x </identifier>
+<identifier>
+<name> x </name>
+<category> field </category>
+<usage> used </usage>
+<index> 0 </index>
+</identifier>
 </term>
 </expression>
 <symbol> , </symbol>
@@ -523,11 +806,21 @@
 <symbol> ( </symbol>
 <expression>
 <term>
-<identifier> y </identifier>
+<identifier>
+<name> y </name>
+<category> field </category>
+<usage> used </usage>
+<index> 1 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 </term>
 </expression>
 <symbol> ) </symbol>
@@ -540,21 +833,41 @@
 <symbol> , </symbol>
 <expression>
 <term>
-<identifier> x </identifier>
+<identifier>
+<name> x </name>
+<category> field </category>
+<usage> used </usage>
+<index> 0 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 </term>
 </expression>
 <symbol> , </symbol>
 <expression>
 <term>
-<identifier> y </identifier>
+<identifier>
+<name> y </name>
+<category> field </category>
+<usage> used </usage>
+<index> 1 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 </term>
 </expression>
 </expressionList>
@@ -563,11 +876,21 @@
 </doStatement>
 <letStatement>
 <keyword> let </keyword>
-<identifier> y </identifier>
+<identifier>
+<name> y </name>
+<category> field </category>
+<usage> used </usage>
+<index> 1 </index>
+</identifier>
 <symbol> = </symbol>
 <expression>
 <term>
-<identifier> y </identifier>
+<identifier>
+<name> y </name>
+<category> field </category>
+<usage> used </usage>
+<index> 1 </index>
+</identifier>
 </term>
 <symbol> - </symbol>
 <term>
@@ -578,9 +901,17 @@
 </letStatement>
 <doStatement>
 <keyword> do </keyword>
-<identifier> Screen </identifier>
+<identifier>
+<name> Screen </name>
+<category> class </category>
+<usage> used </usage>
+</identifier>
 <symbol> . </symbol>
-<identifier> setColor </identifier>
+<identifier>
+<name> setColor </name>
+<category> subroutine </category>
+<usage> used </usage>
+</identifier>
 <symbol> ( </symbol>
 <expressionList>
 <expression>
@@ -594,36 +925,69 @@
 </doStatement>
 <doStatement>
 <keyword> do </keyword>
-<identifier> Screen </identifier>
+<identifier>
+<name> Screen </name>
+<category> class </category>
+<usage> used </usage>
+</identifier>
 <symbol> . </symbol>
-<identifier> drawRectangle </identifier>
+<identifier>
+<name> drawRectangle </name>
+<category> subroutine </category>
+<usage> used </usage>
+</identifier>
 <symbol> ( </symbol>
 <expressionList>
 <expression>
 <term>
-<identifier> x </identifier>
+<identifier>
+<name> x </name>
+<category> field </category>
+<usage> used </usage>
+<index> 0 </index>
+</identifier>
 </term>
 </expression>
 <symbol> , </symbol>
 <expression>
 <term>
-<identifier> y </identifier>
+<identifier>
+<name> y </name>
+<category> field </category>
+<usage> used </usage>
+<index> 1 </index>
+</identifier>
 </term>
 </expression>
 <symbol> , </symbol>
 <expression>
 <term>
-<identifier> x </identifier>
+<identifier>
+<name> x </name>
+<category> field </category>
+<usage> used </usage>
+<index> 0 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 </term>
 </expression>
 <symbol> , </symbol>
 <expression>
 <term>
-<identifier> y </identifier>
+<identifier>
+<name> y </name>
+<category> field </category>
+<usage> used </usage>
+<index> 1 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
@@ -648,7 +1012,11 @@
 <subroutineDec>
 <keyword> method </keyword>
 <keyword> void </keyword>
-<identifier> moveDown </identifier>
+<identifier>
+<name> moveDown </name>
+<category> subroutine </category>
+<usage> declared </usage>
+</identifier>
 <symbol> ( </symbol>
 <parameterList>
 </parameterList>
@@ -664,11 +1032,21 @@
 <symbol> ( </symbol>
 <expression>
 <term>
-<identifier> y </identifier>
+<identifier>
+<name> y </name>
+<category> field </category>
+<usage> used </usage>
+<index> 1 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 </term>
 </expression>
 <symbol> ) </symbol>
@@ -683,9 +1061,17 @@
 <statements>
 <doStatement>
 <keyword> do </keyword>
-<identifier> Screen </identifier>
+<identifier>
+<name> Screen </name>
+<category> class </category>
+<usage> used </usage>
+</identifier>
 <symbol> . </symbol>
-<identifier> setColor </identifier>
+<identifier>
+<name> setColor </name>
+<category> subroutine </category>
+<usage> used </usage>
+</identifier>
 <symbol> ( </symbol>
 <expressionList>
 <expression>
@@ -699,36 +1085,69 @@
 </doStatement>
 <doStatement>
 <keyword> do </keyword>
-<identifier> Screen </identifier>
+<identifier>
+<name> Screen </name>
+<category> class </category>
+<usage> used </usage>
+</identifier>
 <symbol> . </symbol>
-<identifier> drawRectangle </identifier>
+<identifier>
+<name> drawRectangle </name>
+<category> subroutine </category>
+<usage> used </usage>
+</identifier>
 <symbol> ( </symbol>
 <expressionList>
 <expression>
 <term>
-<identifier> x </identifier>
+<identifier>
+<name> x </name>
+<category> field </category>
+<usage> used </usage>
+<index> 0 </index>
+</identifier>
 </term>
 </expression>
 <symbol> , </symbol>
 <expression>
 <term>
-<identifier> y </identifier>
+<identifier>
+<name> y </name>
+<category> field </category>
+<usage> used </usage>
+<index> 1 </index>
+</identifier>
 </term>
 </expression>
 <symbol> , </symbol>
 <expression>
 <term>
-<identifier> x </identifier>
+<identifier>
+<name> x </name>
+<category> field </category>
+<usage> used </usage>
+<index> 0 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 </term>
 </expression>
 <symbol> , </symbol>
 <expression>
 <term>
-<identifier> y </identifier>
+<identifier>
+<name> y </name>
+<category> field </category>
+<usage> used </usage>
+<index> 1 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
@@ -741,11 +1160,21 @@
 </doStatement>
 <letStatement>
 <keyword> let </keyword>
-<identifier> y </identifier>
+<identifier>
+<name> y </name>
+<category> field </category>
+<usage> used </usage>
+<index> 1 </index>
+</identifier>
 <symbol> = </symbol>
 <expression>
 <term>
-<identifier> y </identifier>
+<identifier>
+<name> y </name>
+<category> field </category>
+<usage> used </usage>
+<index> 1 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
@@ -756,9 +1185,17 @@
 </letStatement>
 <doStatement>
 <keyword> do </keyword>
-<identifier> Screen </identifier>
+<identifier>
+<name> Screen </name>
+<category> class </category>
+<usage> used </usage>
+</identifier>
 <symbol> . </symbol>
-<identifier> setColor </identifier>
+<identifier>
+<name> setColor </name>
+<category> subroutine </category>
+<usage> used </usage>
+</identifier>
 <symbol> ( </symbol>
 <expressionList>
 <expression>
@@ -772,14 +1209,27 @@
 </doStatement>
 <doStatement>
 <keyword> do </keyword>
-<identifier> Screen </identifier>
+<identifier>
+<name> Screen </name>
+<category> class </category>
+<usage> used </usage>
+</identifier>
 <symbol> . </symbol>
-<identifier> drawRectangle </identifier>
+<identifier>
+<name> drawRectangle </name>
+<category> subroutine </category>
+<usage> used </usage>
+</identifier>
 <symbol> ( </symbol>
 <expressionList>
 <expression>
 <term>
-<identifier> x </identifier>
+<identifier>
+<name> x </name>
+<category> field </category>
+<usage> used </usage>
+<index> 0 </index>
+</identifier>
 </term>
 </expression>
 <symbol> , </symbol>
@@ -788,11 +1238,21 @@
 <symbol> ( </symbol>
 <expression>
 <term>
-<identifier> y </identifier>
+<identifier>
+<name> y </name>
+<category> field </category>
+<usage> used </usage>
+<index> 1 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 </term>
 </expression>
 <symbol> ) </symbol>
@@ -805,21 +1265,41 @@
 <symbol> , </symbol>
 <expression>
 <term>
-<identifier> x </identifier>
+<identifier>
+<name> x </name>
+<category> field </category>
+<usage> used </usage>
+<index> 0 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 </term>
 </expression>
 <symbol> , </symbol>
 <expression>
 <term>
-<identifier> y </identifier>
+<identifier>
+<name> y </name>
+<category> field </category>
+<usage> used </usage>
+<index> 1 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 </term>
 </expression>
 </expressionList>
@@ -840,7 +1320,11 @@
 <subroutineDec>
 <keyword> method </keyword>
 <keyword> void </keyword>
-<identifier> moveLeft </identifier>
+<identifier>
+<name> moveLeft </name>
+<category> subroutine </category>
+<usage> declared </usage>
+</identifier>
 <symbol> ( </symbol>
 <parameterList>
 </parameterList>
@@ -853,7 +1337,12 @@
 <symbol> ( </symbol>
 <expression>
 <term>
-<identifier> x </identifier>
+<identifier>
+<name> x </name>
+<category> field </category>
+<usage> used </usage>
+<index> 0 </index>
+</identifier>
 </term>
 <symbol> &gt; </symbol>
 <term>
@@ -865,9 +1354,17 @@
 <statements>
 <doStatement>
 <keyword> do </keyword>
-<identifier> Screen </identifier>
+<identifier>
+<name> Screen </name>
+<category> class </category>
+<usage> used </usage>
+</identifier>
 <symbol> . </symbol>
-<identifier> setColor </identifier>
+<identifier>
+<name> setColor </name>
+<category> subroutine </category>
+<usage> used </usage>
+</identifier>
 <symbol> ( </symbol>
 <expressionList>
 <expression>
@@ -881,9 +1378,17 @@
 </doStatement>
 <doStatement>
 <keyword> do </keyword>
-<identifier> Screen </identifier>
+<identifier>
+<name> Screen </name>
+<category> class </category>
+<usage> used </usage>
+</identifier>
 <symbol> . </symbol>
-<identifier> drawRectangle </identifier>
+<identifier>
+<name> drawRectangle </name>
+<category> subroutine </category>
+<usage> used </usage>
+</identifier>
 <symbol> ( </symbol>
 <expressionList>
 <expression>
@@ -891,11 +1396,21 @@
 <symbol> ( </symbol>
 <expression>
 <term>
-<identifier> x </identifier>
+<identifier>
+<name> x </name>
+<category> field </category>
+<usage> used </usage>
+<index> 0 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 </term>
 </expression>
 <symbol> ) </symbol>
@@ -908,27 +1423,52 @@
 <symbol> , </symbol>
 <expression>
 <term>
-<identifier> y </identifier>
+<identifier>
+<name> y </name>
+<category> field </category>
+<usage> used </usage>
+<index> 1 </index>
+</identifier>
 </term>
 </expression>
 <symbol> , </symbol>
 <expression>
 <term>
-<identifier> x </identifier>
+<identifier>
+<name> x </name>
+<category> field </category>
+<usage> used </usage>
+<index> 0 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 </term>
 </expression>
 <symbol> , </symbol>
 <expression>
 <term>
-<identifier> y </identifier>
+<identifier>
+<name> y </name>
+<category> field </category>
+<usage> used </usage>
+<index> 1 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 </term>
 </expression>
 </expressionList>
@@ -937,11 +1477,21 @@
 </doStatement>
 <letStatement>
 <keyword> let </keyword>
-<identifier> x </identifier>
+<identifier>
+<name> x </name>
+<category> field </category>
+<usage> used </usage>
+<index> 0 </index>
+</identifier>
 <symbol> = </symbol>
 <expression>
 <term>
-<identifier> x </identifier>
+<identifier>
+<name> x </name>
+<category> field </category>
+<usage> used </usage>
+<index> 0 </index>
+</identifier>
 </term>
 <symbol> - </symbol>
 <term>
@@ -952,9 +1502,17 @@
 </letStatement>
 <doStatement>
 <keyword> do </keyword>
-<identifier> Screen </identifier>
+<identifier>
+<name> Screen </name>
+<category> class </category>
+<usage> used </usage>
+</identifier>
 <symbol> . </symbol>
-<identifier> setColor </identifier>
+<identifier>
+<name> setColor </name>
+<category> subroutine </category>
+<usage> used </usage>
+</identifier>
 <symbol> ( </symbol>
 <expressionList>
 <expression>
@@ -968,26 +1526,49 @@
 </doStatement>
 <doStatement>
 <keyword> do </keyword>
-<identifier> Screen </identifier>
+<identifier>
+<name> Screen </name>
+<category> class </category>
+<usage> used </usage>
+</identifier>
 <symbol> . </symbol>
-<identifier> drawRectangle </identifier>
+<identifier>
+<name> drawRectangle </name>
+<category> subroutine </category>
+<usage> used </usage>
+</identifier>
 <symbol> ( </symbol>
 <expressionList>
 <expression>
 <term>
-<identifier> x </identifier>
+<identifier>
+<name> x </name>
+<category> field </category>
+<usage> used </usage>
+<index> 0 </index>
+</identifier>
 </term>
 </expression>
 <symbol> , </symbol>
 <expression>
 <term>
-<identifier> y </identifier>
+<identifier>
+<name> y </name>
+<category> field </category>
+<usage> used </usage>
+<index> 1 </index>
+</identifier>
 </term>
 </expression>
 <symbol> , </symbol>
 <expression>
 <term>
-<identifier> x </identifier>
+<identifier>
+<name> x </name>
+<category> field </category>
+<usage> used </usage>
+<index> 0 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
@@ -997,11 +1578,21 @@
 <symbol> , </symbol>
 <expression>
 <term>
-<identifier> y </identifier>
+<identifier>
+<name> y </name>
+<category> field </category>
+<usage> used </usage>
+<index> 1 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 </term>
 </expression>
 </expressionList>
@@ -1022,7 +1613,11 @@
 <subroutineDec>
 <keyword> method </keyword>
 <keyword> void </keyword>
-<identifier> moveRight </identifier>
+<identifier>
+<name> moveRight </name>
+<category> subroutine </category>
+<usage> declared </usage>
+</identifier>
 <symbol> ( </symbol>
 <parameterList>
 </parameterList>
@@ -1038,11 +1633,21 @@
 <symbol> ( </symbol>
 <expression>
 <term>
-<identifier> x </identifier>
+<identifier>
+<name> x </name>
+<category> field </category>
+<usage> used </usage>
+<index> 0 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 </term>
 </expression>
 <symbol> ) </symbol>
@@ -1057,9 +1662,17 @@
 <statements>
 <doStatement>
 <keyword> do </keyword>
-<identifier> Screen </identifier>
+<identifier>
+<name> Screen </name>
+<category> class </category>
+<usage> used </usage>
+</identifier>
 <symbol> . </symbol>
-<identifier> setColor </identifier>
+<identifier>
+<name> setColor </name>
+<category> subroutine </category>
+<usage> used </usage>
+</identifier>
 <symbol> ( </symbol>
 <expressionList>
 <expression>
@@ -1073,26 +1686,49 @@
 </doStatement>
 <doStatement>
 <keyword> do </keyword>
-<identifier> Screen </identifier>
+<identifier>
+<name> Screen </name>
+<category> class </category>
+<usage> used </usage>
+</identifier>
 <symbol> . </symbol>
-<identifier> drawRectangle </identifier>
+<identifier>
+<name> drawRectangle </name>
+<category> subroutine </category>
+<usage> used </usage>
+</identifier>
 <symbol> ( </symbol>
 <expressionList>
 <expression>
 <term>
-<identifier> x </identifier>
+<identifier>
+<name> x </name>
+<category> field </category>
+<usage> used </usage>
+<index> 0 </index>
+</identifier>
 </term>
 </expression>
 <symbol> , </symbol>
 <expression>
 <term>
-<identifier> y </identifier>
+<identifier>
+<name> y </name>
+<category> field </category>
+<usage> used </usage>
+<index> 1 </index>
+</identifier>
 </term>
 </expression>
 <symbol> , </symbol>
 <expression>
 <term>
-<identifier> x </identifier>
+<identifier>
+<name> x </name>
+<category> field </category>
+<usage> used </usage>
+<index> 0 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
@@ -1102,11 +1738,21 @@
 <symbol> , </symbol>
 <expression>
 <term>
-<identifier> y </identifier>
+<identifier>
+<name> y </name>
+<category> field </category>
+<usage> used </usage>
+<index> 1 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 </term>
 </expression>
 </expressionList>
@@ -1115,11 +1761,21 @@
 </doStatement>
 <letStatement>
 <keyword> let </keyword>
-<identifier> x </identifier>
+<identifier>
+<name> x </name>
+<category> field </category>
+<usage> used </usage>
+<index> 0 </index>
+</identifier>
 <symbol> = </symbol>
 <expression>
 <term>
-<identifier> x </identifier>
+<identifier>
+<name> x </name>
+<category> field </category>
+<usage> used </usage>
+<index> 0 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
@@ -1130,9 +1786,17 @@
 </letStatement>
 <doStatement>
 <keyword> do </keyword>
-<identifier> Screen </identifier>
+<identifier>
+<name> Screen </name>
+<category> class </category>
+<usage> used </usage>
+</identifier>
 <symbol> . </symbol>
-<identifier> setColor </identifier>
+<identifier>
+<name> setColor </name>
+<category> subroutine </category>
+<usage> used </usage>
+</identifier>
 <symbol> ( </symbol>
 <expressionList>
 <expression>
@@ -1146,9 +1810,17 @@
 </doStatement>
 <doStatement>
 <keyword> do </keyword>
-<identifier> Screen </identifier>
+<identifier>
+<name> Screen </name>
+<category> class </category>
+<usage> used </usage>
+</identifier>
 <symbol> . </symbol>
-<identifier> drawRectangle </identifier>
+<identifier>
+<name> drawRectangle </name>
+<category> subroutine </category>
+<usage> used </usage>
+</identifier>
 <symbol> ( </symbol>
 <expressionList>
 <expression>
@@ -1156,11 +1828,21 @@
 <symbol> ( </symbol>
 <expression>
 <term>
-<identifier> x </identifier>
+<identifier>
+<name> x </name>
+<category> field </category>
+<usage> used </usage>
+<index> 0 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 </term>
 </expression>
 <symbol> ) </symbol>
@@ -1173,27 +1855,52 @@
 <symbol> , </symbol>
 <expression>
 <term>
-<identifier> y </identifier>
+<identifier>
+<name> y </name>
+<category> field </category>
+<usage> used </usage>
+<index> 1 </index>
+</identifier>
 </term>
 </expression>
 <symbol> , </symbol>
 <expression>
 <term>
-<identifier> x </identifier>
+<identifier>
+<name> x </name>
+<category> field </category>
+<usage> used </usage>
+<index> 0 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 </term>
 </expression>
 <symbol> , </symbol>
 <expression>
 <term>
-<identifier> y </identifier>
+<identifier>
+<name> y </name>
+<category> field </category>
+<usage> used </usage>
+<index> 1 </index>
+</identifier>
 </term>
 <symbol> + </symbol>
 <term>
-<identifier> size </identifier>
+<identifier>
+<name> size </name>
+<category> field </category>
+<usage> used </usage>
+<index> 2 </index>
+</identifier>
 </term>
 </expression>
 </expressionList>

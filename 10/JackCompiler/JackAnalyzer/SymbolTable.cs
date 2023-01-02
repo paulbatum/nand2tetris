@@ -8,27 +8,27 @@ namespace JackAnalyzer
 {
     internal class SymbolTable
     {
-        private Dictionary<string, Symbol> _symbols = new Dictionary<string, Symbol>();
-        private Dictionary<SymbolKind, int> _indexes = new Dictionary<SymbolKind, int>();
+        private Dictionary<string, Symbol> symbols = new Dictionary<string, Symbol>();
+        private Dictionary<SymbolKind, int> indexes = new Dictionary<SymbolKind, int>();
 
         public SymbolTable()
         {
             foreach (var k in Enum.GetValues<SymbolKind>())
-                _indexes[k] = 0;
+                indexes[k] = 0;
         }
 
         public void Define(string name, string type, SymbolKind kind)
         {
-            var index = _indexes[kind];
-            _indexes[kind] = index + 1;
+            var index = indexes[kind];
+            indexes[kind] = index + 1;
 
             var s = new Symbol { Name = name, Type = type, Index = index, Kind = kind };
-            _symbols[name] = s;
+            symbols[name] = s;
         }
 
-        public Symbol Lookup(string name) => _symbols[name];
+        public Symbol? Lookup(string name) => symbols.GetValueOrDefault(name);
 
-        public int VarCount(SymbolKind kind) => _indexes[kind] - 1;
+        public int VarCount(SymbolKind kind) => indexes[kind] - 1;
 
         public class Symbol
         {
@@ -38,6 +38,8 @@ namespace JackAnalyzer
             public int Index { get; set; }
         }
     }
+
+    
 
     public enum SymbolKind
     {
