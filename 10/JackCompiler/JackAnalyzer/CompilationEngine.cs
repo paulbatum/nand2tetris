@@ -9,17 +9,20 @@ namespace JackAnalyzer
     public class CompilationEngine
     {        
         private JackTokenizer tokenizer;
-        private StreamWriter output;
+        private StreamWriter xmlOutput;
+        private VMWriter vmWriter;
         private bool expectingLastToken = false;
         private SymbolTable classTable = new SymbolTable();
         private SymbolTable subroutineTable = new SymbolTable();
         private SymbolTable currentTable;
         private StringBuilder processedTokens = new StringBuilder();
+        private string className;
 
-        public CompilationEngine(StreamReader input, StreamWriter output)
+        public CompilationEngine(StreamReader input, StreamWriter xmlOutput, VMWriter vmWriter)
         {
             tokenizer = new JackTokenizer(input);    
-            this.output = output;
+            this.xmlOutput = xmlOutput;
+            this.vmWriter = vmWriter;
             currentTable = classTable;
     }
 
@@ -32,7 +35,7 @@ namespace JackAnalyzer
 
             WriteStartElement("class");
             ProcessKeyword(Keyword.Class);
-            ProcessClassNameDeclared();
+            className = ProcessClassNameDeclared();
             ProcessCharacterSymbol("{");
           
             while (CurrentTokenIsClassVarDec)
@@ -76,6 +79,7 @@ namespace JackAnalyzer
 
         private void CompileSubroutineDec()
         {
+            subroutineTable = new SymbolTable();
             currentTable = subroutineTable;
             WriteStartElement("subroutineDec");
 
@@ -89,10 +93,12 @@ namespace JackAnalyzer
                 ProcessTypename();
             }
 
-            ProcessSubroutineNameDeclared();
+            var subroutineName = ProcessSubroutineNameDeclared();
             ProcessCharacterSymbol("(");
-            CompileParameterList();
+            var parameterCount = CompileParameterList();
             ProcessCharacterSymbol(")");
+
+            vmWriter.WriteFunction($"{className}.{subroutineName}", parameterCount);
             
             WriteStartElement("subroutineBody");
             ProcessCharacterSymbol("{");
@@ -296,13 +302,15 @@ namespace JackAnalyzer
             WriteEndElement("expression");
         }
 
-        private void CompileParameterList()
+        private int CompileParameterList()
         {
+            int parameterCount = 0;
             WriteStartElement("parameterList");
             while (CurrentTokenIsTypename)
             {
                 var symbolType = ProcessTypename();
                 ProcessSymbolDeclared(SymbolKind.Arg, symbolType);
+                parameterCount += 1;
                 if (CurrentTokenIsComma)
                 {
                     Process(); // comma
@@ -312,6 +320,8 @@ namespace JackAnalyzer
                 break;
             }
             WriteEndElement("parameterList");
+
+            return parameterCount;
         }
 
         private void CompileExpressionList()
@@ -359,8 +369,8 @@ namespace JackAnalyzer
         }
 
         private void Dump() => System.Diagnostics.Debug.WriteLine(processedTokens.ToString());
-        private void WriteStartElement(string element) => output.WriteLine($"<{element}>");
-        private void WriteEndElement(string element) => output.WriteLine($"</{element}>");
+        private void WriteStartElement(string element) => xmlOutput.WriteLine($"<{element}>");
+        private void WriteEndElement(string element) => xmlOutput.WriteLine($"</{element}>");
 
         private void WriteXml(Token token)
         {
@@ -380,7 +390,7 @@ namespace JackAnalyzer
 
         private void WriteXmlElement(string elementName, string elementValue)
         {
-            output.WriteLine($"<{elementName}> {elementValue} </{elementName}>");
+            xmlOutput.WriteLine($"<{elementName}> {elementValue} </{elementName}>");
         }
 
         private void Process() => Process(ct);
@@ -424,22 +434,30 @@ namespace JackAnalyzer
             Process(TokenType.Symbol, expectedValue: expectedValue);
         }
 
-        private void ProcessClassNameDeclared()
+        private string ProcessClassNameDeclared()
         {
             if (ct.TokenType != TokenType.Identifier)
                 throw new Exception($"Expected identifier for class name. Current token: '{ct}'.");
 
+            var className = ct.Value;
+
             WriteIdentifierXml(ct.Value, SymbolCategory.Class.ToString(), SymbolUsage.Declared);
             Advance();
+
+            return className;
         }
 
-        private void ProcessSubroutineNameDeclared()
+        private string ProcessSubroutineNameDeclared()
         {
             if (ct.TokenType != TokenType.Identifier)
                 throw new Exception($"Expected identifier for subroutine name. Current token: '{ct}'.");
 
-            WriteIdentifierXml(ct.Value, SymbolCategory.Subroutine.ToString(), SymbolUsage.Declared);
+            var subroutineName = ct.Value;
+
+            WriteIdentifierXml(subroutineName, SymbolCategory.Subroutine.ToString(), SymbolUsage.Declared);
             Advance();
+
+            return subroutineName;
         }
 
         private void ProcessSymbolDeclared(SymbolKind kind, string symbolType)

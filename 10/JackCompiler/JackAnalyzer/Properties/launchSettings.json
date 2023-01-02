@@ -10,6 +10,10 @@
     "JackAnalyzer-ELSquare": {
       "commandName": "Project",
       "workingDirectory": "D:\\code\\nand2tetris\\projects\\10\\ExpressionLessSquare"
+    },
+    "JackCompiler-Seven": {
+      "commandName": "Project",
+      "workingDirectory": "D:\\code\\nand2tetris\\projects\\11\\Seven"
     }
   }
 }

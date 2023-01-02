@@ -32,10 +32,13 @@ namespace JackAnalyzer
             {
                 using (var input = new StreamReader(f))
                 {
-                    var outputFileName = Path.Combine(parentDir, Path.GetFileNameWithoutExtension(f) + ".output.xml");
-                    using (var writer = new StreamWriter(outputFileName))
+                    var xmlOutputFileName = Path.Combine(parentDir, Path.GetFileNameWithoutExtension(f) + ".output.xml");
+                    var vmOutputFileName = Path.Combine(parentDir, Path.GetFileNameWithoutExtension(f) + ".vm");
+                    using (var xmlOutput = new StreamWriter(xmlOutputFileName))
+                    using (var vmOutput = new StreamWriter(vmOutputFileName))                    
                     {
-                        CompilationEngine engine = new CompilationEngine(input, writer);
+                        var vmWriter = new VMWriter(vmOutput);
+                        CompilationEngine engine = new CompilationEngine(input, xmlOutput, vmWriter);
                         engine.CompileClass();
                     }
                 }
