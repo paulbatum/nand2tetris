@@ -39,6 +39,11 @@ namespace JackAnalyzer
         {
             output.WriteLine($"pop {segment.ToString().ToLower()} {index}");
         }
+
+        public void WriteArithmetic(string op)
+        {
+            output.WriteLine(op);
+        }
     }
 
     public enum Segment

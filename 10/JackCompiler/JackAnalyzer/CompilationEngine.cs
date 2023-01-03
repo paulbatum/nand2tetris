@@ -69,7 +69,6 @@ namespace JackAnalyzer
             while(CurrentTokenIsComma)
             {
                 ProcessCharacterSymbol(",");
-                //ProcessIdentifier(symbolCategory, SymbolUsage.Declared);
                 ProcessSymbolDeclared(symbolKind, symbolType);
             }
 
@@ -137,72 +136,19 @@ namespace JackAnalyzer
                 switch(ct.Keyword)
                 {
                     case Keyword.Let:
-                        WriteStartElement("letStatement");
-                        Process(); // let keyword
-                        ProcessSymbolUsed();
-                        if(ct.TokenType == TokenType.Symbol && ct.Value == "[")
-                        {
-                            Process(); // the opening bracket
-                            CompileExpression();                            
-                            ProcessCharacterSymbol("]");
-                        }
-
-                        ProcessCharacterSymbol("=");
-                        CompileExpression();
-                        ProcessCharacterSymbol(";");
-                        WriteEndElement("letStatement");
+                        CompileLet();
                         break;
                     case Keyword.If:
-                        WriteStartElement("ifStatement");
-                        Process(); // if keyword
-                        ProcessCharacterSymbol("(");
-                        CompileExpression();
-                        ProcessCharacterSymbol(")");
-                        ProcessCharacterSymbol("{");
-                        CompileStatements();
-                        ProcessCharacterSymbol("}");
-
-                        if(ct.Keyword == Keyword.Else)
-                        {
-                            Process(); // else keyword
-                            ProcessCharacterSymbol("{");
-                            CompileStatements();
-                            ProcessCharacterSymbol("}");
-                        }
-                        WriteEndElement("ifStatement");
+                        CompileIf();
                         break;
                     case Keyword.While:
-                        WriteStartElement("whileStatement");
-                        Process(); // while keyword
-                        ProcessCharacterSymbol("(");
-                        CompileExpression();
-                        ProcessCharacterSymbol(")");
-                        ProcessCharacterSymbol("{");
-                        CompileStatements();
-                        ProcessCharacterSymbol("}");
-                        WriteEndElement("whileStatement");
+                        CompileWhile();
                         break;
                     case Keyword.Do:
-                        WriteStartElement("doStatement");
-                        Process(); // do keyword
-                        //ProcessSubroutineCall();
-                        CompileTerm(isDo:true);
-                        ProcessCharacterSymbol(";");
-                        WriteEndElement("doStatement");
+                        CompileDo();
                         break;
                     case Keyword.Return:
-                        WriteStartElement("returnStatement");
-                        Process(); // return keyword
-                        if(ct.TokenType == TokenType.Symbol && ct.Value == ";")
-                        {
-                            ProcessCharacterSymbol(";");
-                        }
-                        else
-                        {
-                            CompileExpression();
-                            ProcessCharacterSymbol(";");
-                        }
-                        WriteEndElement("returnStatement");
+                        CompileReturn();
                         break;
                     default:
                         throw new Exception("unreachable");
@@ -210,6 +156,83 @@ namespace JackAnalyzer
             }
 
             WriteEndElement("statements");
+        }
+
+        private void CompileLet()
+        {
+            WriteStartElement("letStatement");
+            Process(); // let keyword
+            ProcessSymbolUsed();
+            if (ct.TokenType == TokenType.Symbol && ct.Value == "[")
+            {
+                Process(); // the opening bracket
+                CompileExpression();
+                ProcessCharacterSymbol("]");
+            }
+
+            ProcessCharacterSymbol("=");
+            CompileExpression();
+            ProcessCharacterSymbol(";");
+            WriteEndElement("letStatement");
+        }
+
+        private void CompileIf()
+        {
+            WriteStartElement("ifStatement");
+            Process(); // if keyword
+            ProcessCharacterSymbol("(");
+            CompileExpression();
+            ProcessCharacterSymbol(")");
+            ProcessCharacterSymbol("{");
+            CompileStatements();
+            ProcessCharacterSymbol("}");
+
+            if (ct.Keyword == Keyword.Else)
+            {
+                Process(); // else keyword
+                ProcessCharacterSymbol("{");
+                CompileStatements();
+                ProcessCharacterSymbol("}");
+            }
+            WriteEndElement("ifStatement");
+        }
+
+        private void CompileWhile()
+        {
+            WriteStartElement("whileStatement");
+            Process(); // while keyword
+            ProcessCharacterSymbol("(");
+            CompileExpression();
+            ProcessCharacterSymbol(")");
+            ProcessCharacterSymbol("{");
+            CompileStatements();
+            ProcessCharacterSymbol("}");
+            WriteEndElement("whileStatement");
+        }
+
+        private void CompileDo()
+        {
+            WriteStartElement("doStatement");
+            Process(); // do keyword                       
+            CompileTerm(isDo: true);
+            ProcessCharacterSymbol(";");
+            WriteEndElement("doStatement");
+        }
+
+        private void CompileReturn()
+        {
+            WriteStartElement("returnStatement");
+            Process(); // return keyword
+            if (ct.TokenType == TokenType.Symbol && ct.Value == ";")
+            {
+                ProcessCharacterSymbol(";");
+            }
+            else
+            {
+                CompileExpression();
+                ProcessCharacterSymbol(";");
+            }
+            WriteEndElement("returnStatement");
         }
 
         public void CompileTerm(bool isDo = false)
@@ -221,6 +244,7 @@ namespace JackAnalyzer
 
             if (ct.TokenType == TokenType.IntegerConstant)
             {
+                vmWriter.WritePush(Segment.Constant, int.Parse(ct.Value));
                 Process();
             }
             else if (ct.TokenType == TokenType.StringConstant)
@@ -239,8 +263,10 @@ namespace JackAnalyzer
             }
             else if (CurrentTokenIsUnaryOp)
             {
-                Process();
+                var op = ct;
+                Advance();
                 CompileTerm();
+                CompileUnary(op);
             }
             else if (ct.TokenType == TokenType.Identifier)
             {
@@ -293,13 +319,51 @@ namespace JackAnalyzer
             WriteStartElement("expression");
 
             CompileTerm();
-            while (CurrentTokenIsOp)
+            while (CurrentTokenIsBinaryOp)
             {
-                Process(); // the operator
+                var op = ct;               
+                Advance();
                 CompileTerm();
+                CompileBinaryOp(op);
             }
 
             WriteEndElement("expression");
+        }
+
+        private void CompileBinaryOp(Token op)
+        {
+            switch(op.Value)
+            {
+                case "+":
+                    vmWriter.WriteArithmetic("add");
+                    break;
+                case "-":
+                    vmWriter.WriteArithmetic("sub");
+                    break;
+                case "*":
+                    vmWriter.WriteCall("Math.multiply", 2);
+                    break;
+                case "/":
+                    vmWriter.WriteCall("Math.divide", 2);
+                    break;
+                default:
+                    throw new Exception($"Unrecognized op: {op.Value}");
+            }
+        }
+
+        private void CompileUnary(Token op)
+        {
+            switch(op.Value)
+            {
+                case "-":
+                    vmWriter.WriteArithmetic("neg");
+                    break;
+                case "~":
+                    vmWriter.WriteArithmetic("not");
+                    break;
+                default:
+                    throw new Exception($"Unrecognized op: {op.Value}");
+            }
         }
 
         private int CompileParameterList()
@@ -521,7 +585,7 @@ namespace JackAnalyzer
             }
             else if (ct.TokenType == TokenType.Identifier)
             {
-                ProcessSymbolUsed("class");
+                ProcessSymbolUsed(SymbolCategory.Class.ToString());
             }
             else
             {
@@ -599,7 +663,7 @@ namespace JackAnalyzer
         private bool CurrentTokenIsOpenParen => ct.TokenType == TokenType.Symbol && ct.Value == "(";
 
         private static readonly List<string> BinaryOperators = new List<string> { "+", "-", "*", "/", "&", "|", "<", ">", "=" };
-        private bool CurrentTokenIsOp => ct.TokenType == TokenType.Symbol && BinaryOperators.Contains(ct.Value);
+        private bool CurrentTokenIsBinaryOp => ct.TokenType == TokenType.Symbol && BinaryOperators.Contains(ct.Value);
         
         private enum SymbolCategory
         {
