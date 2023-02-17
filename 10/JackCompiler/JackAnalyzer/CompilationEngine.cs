@@ -162,7 +162,7 @@ namespace JackAnalyzer
         {
             WriteStartElement("letStatement");
             Process(); // let keyword
-            ProcessSymbolUsed();
+            ProcessSymbolUsed(); 
             if (ct.TokenType == TokenType.Symbol && ct.Value == "[")
             {
                 Process(); // the opening bracket
@@ -281,7 +281,7 @@ namespace JackAnalyzer
                             ProcessSymbolUsed(identifier, SymbolCategory.Subroutine.ToString());
                             ProcessCharacterSymbol("(");
                             CompileExpressionList();
-                            ProcessCharacterSymbol(")");                            
+                            ProcessCharacterSymbol(")");
                             break;
                         case "[":
                             ProcessSymbolUsed(identifier);
@@ -290,15 +290,21 @@ namespace JackAnalyzer
                             ProcessCharacterSymbol("]");
                             break;
                         case ".":
-                            ProcessSymbolUsed(identifier, SymbolCategory.Class.ToString());
+                            var i1 = ProcessSymbolUsed(identifier, SymbolCategory.Class.ToString());
                             ProcessCharacterSymbol(".");
-                            ProcessSymbolUsed(SymbolCategory.Subroutine.ToString());
+                            var i2 = ProcessSymbolUsed(SymbolCategory.Subroutine.ToString());
                             ProcessCharacterSymbol("(");
-                            CompileExpressionList();
+                            var expressionCount = CompileExpressionList();
                             ProcessCharacterSymbol(")");
+                            vmWriter.WriteCall($"{i1}.{i2}", expressionCount);
                             break;
                         default:
-                            ProcessSymbolUsed(identifier);
+                            var i3 = ProcessSymbolUsed(identifier);
+                            var symbol = currentTable.Lookup(i3);
+                            if (symbol != null)
+                            {
+                                vmWriter.WritePush(symbol.Segment, symbol.Index);
+                            }
                             break;
                     }
                 }
@@ -307,11 +313,16 @@ namespace JackAnalyzer
             {
                 throw new Exception($"Expected a term, got '{ct}'.");
             }
-
-            if (!isDo)
+             
+            if (isDo)
+            {
+                vmWriter.WritePop(Segment.Temp, 0);
+            }
+            else
             {
                 WriteEndElement("term");
             }
+
         }
 
         private void CompileExpression()
@@ -345,6 +356,21 @@ namespace JackAnalyzer
                     break;
                 case "/":
                     vmWriter.WriteCall("Math.divide", 2);
+                    break;
+                case "<":
+                    vmWriter.WriteArithmetic("lt");
+                    break;
+                case ">":
+                    vmWriter.WriteArithmetic("gt");
+                    break;
+                case "&":
+                    vmWriter.WriteArithmetic("and");
+                    break;
+                case "|":
+                    vmWriter.WriteArithmetic("or");
+                    break;
+                case "=":
+                    vmWriter.WriteArithmetic("eq");
                     break;
                 default:
                     throw new Exception($"Unrecognized op: {op.Value}");
@@ -388,21 +414,25 @@ namespace JackAnalyzer
             return parameterCount;
         }
 
-        private void CompileExpressionList()
-        {            
+        private int CompileExpressionList()
+        {
+            int expressionCount = 0;
             WriteStartElement("expressionList");
 
             if (ct.TokenType != TokenType.Symbol || ct.Value != ")")
             { 
                 CompileExpression();
+                expressionCount += 1;
                 while (CurrentTokenIsComma)
                 {
                     ProcessCharacterSymbol(",");
                     CompileExpression();
+                    expressionCount += 1;
                 }                
             }
 
             WriteEndElement("expressionList");
+            return expressionCount;
         }
 
         private void Advance()
@@ -536,13 +566,14 @@ namespace JackAnalyzer
             Advance();
         }
 
-        private void ProcessSymbolUsed(string typeHint = "dont know")
+        private string ProcessSymbolUsed(string typeHint = "dont know")
         {
-            ProcessSymbolUsed(ct, typeHint);
+            var symbol = ProcessSymbolUsed(ct, typeHint);
             Advance();
+            return symbol;
         }
 
-        private void ProcessSymbolUsed(Token token, string typeHint = "dont know")
+        private string ProcessSymbolUsed(Token token, string typeHint = "dont know")
         {
             if (token.TokenType != TokenType.Identifier)
                 throw new Exception($"Expected identifier. Token: '{token}'.");
@@ -553,10 +584,12 @@ namespace JackAnalyzer
             {
                 // this must be a subroutine name / class name
                 WriteIdentifierXml(token.Value, typeHint, SymbolUsage.Used);
+                return token.Value;
             }
             else
             {
                 WriteIdentifierXml(s.Name, s.Kind.ToString(), SymbolUsage.Used, s.Index);
+                return s.Name;
             }
             
         }

@@ -14,6 +14,10 @@
     "JackCompiler-Seven": {
       "commandName": "Project",
       "workingDirectory": "D:\\code\\nand2tetris\\projects\\11\\Seven"
+    },
+    "JackCompiler-ConvertToBin": {
+      "commandName": "Project",
+      "workingDirectory": "D:\\code\\nand2tetris\\projects\\11\\ConvertToBin"
     }
   }
 }

@@ -36,6 +36,14 @@ namespace JackAnalyzer
             public string Type { get; set; }
             public SymbolKind Kind { get; set; }
             public int Index { get; set; }
+
+            public Segment Segment => this.Kind switch
+            {
+                SymbolKind.Static => Segment.Static,
+                SymbolKind.Field => throw new NotImplementedException(),
+                SymbolKind.Arg => Segment.Argument,
+                SymbolKind.Var => Segment.Local,
+            };
         }
     }
 
