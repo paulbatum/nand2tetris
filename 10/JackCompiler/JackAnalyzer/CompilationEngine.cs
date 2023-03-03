@@ -17,6 +17,7 @@ namespace JackAnalyzer
         private SymbolTable currentTable;
         private StringBuilder processedTokens = new StringBuilder();
         private string className;
+        private int labelCounter = 0;
 
         public CompilationEngine(StreamReader input, StreamWriter xmlOutput, VMWriter vmWriter)
         {
@@ -162,7 +163,7 @@ namespace JackAnalyzer
         {
             WriteStartElement("letStatement");
             Process(); // let keyword
-            ProcessSymbolUsed(); 
+            var identifier = ProcessSymbolUsed(); 
             if (ct.TokenType == TokenType.Symbol && ct.Value == "[")
             {
                 Process(); // the opening bracket
@@ -172,6 +173,7 @@ namespace JackAnalyzer
 
             ProcessCharacterSymbol("=");
             CompileExpression();
+            vmWriter.WritePop(Segment.Local, currentTable.Lookup(identifier).Index);
             ProcessCharacterSymbol(";");
             WriteEndElement("letStatement");
         }
@@ -181,11 +183,21 @@ namespace JackAnalyzer
             WriteStartElement("ifStatement");
             Process(); // if keyword
             ProcessCharacterSymbol("(");
-            CompileExpression();
+            CompileExpression();           
             ProcessCharacterSymbol(")");
+
+            var labelIndex = labelCounter++;
+            var l1 = $"IF_FALSE{labelIndex}";
+            var l2 = $"IF_EXIT{labelIndex}";
+
+            vmWriter.WriteArithmetic("not");
+            vmWriter.WriteIfGoto(l1);
+
             ProcessCharacterSymbol("{");
             CompileStatements();
             ProcessCharacterSymbol("}");
+            vmWriter.WriteGoto(l2);
+            vmWriter.WriteLabel(l1);
 
             if (ct.Keyword == Keyword.Else)
             {
@@ -194,6 +206,8 @@ namespace JackAnalyzer
                 CompileStatements();
                 ProcessCharacterSymbol("}");
             }
+            vmWriter.WriteLabel(l2);
+
             WriteEndElement("ifStatement");
         }
 
@@ -201,12 +215,24 @@ namespace JackAnalyzer
         {
             WriteStartElement("whileStatement");
             Process(); // while keyword
+
+            var labelIndex = labelCounter++;
+            var l1 = $"WHILE{labelIndex}";
+            var l2 = $"WHILE_EXIT{labelIndex}";
+            vmWriter.WriteLabel(l1);
+
             ProcessCharacterSymbol("(");
             CompileExpression();
             ProcessCharacterSymbol(")");
+            vmWriter.WriteArithmetic("not");
+            vmWriter.WriteIfGoto(l2);
+
             ProcessCharacterSymbol("{");
             CompileStatements();
             ProcessCharacterSymbol("}");
+
+            vmWriter.WriteGoto(l1);
+            vmWriter.WriteLabel(l2);
             WriteEndElement("whileStatement");
         }
 
@@ -255,6 +281,21 @@ namespace JackAnalyzer
             }
             else if (CurrentTokenIsKeywordConstant)
             {
+                switch(ct.Keyword)
+                {
+                    case Keyword.This:
+                        vmWriter.WritePush(Segment.Pointer, 0);
+                        break;
+                    case Keyword.Null:
+                    case Keyword.False:
+                        vmWriter.WritePush(Segment.Constant, 0);
+                        break;
+                    case Keyword.True:
+                        vmWriter.WritePush(Segment.Constant, 1);
+                        break;
+                    default:
+                        throw new Exception("Unrecognized keyword constant");
+                }
                 Process();
             }
             else if (CurrentTokenIsOpenParen)

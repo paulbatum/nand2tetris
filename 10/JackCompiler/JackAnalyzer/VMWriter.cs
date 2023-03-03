@@ -44,6 +44,21 @@ namespace JackAnalyzer
         {
             output.WriteLine(op);
         }
+
+        public void WriteGoto(string label)
+        {
+            output.WriteLine($"goto {label}");
+        }
+
+        public void WriteIfGoto(string label)
+        {
+            output.WriteLine($"if-goto {label}");
+        }
+
+        public void WriteLabel(string label)
+        {
+            output.WriteLine($"label {label}");
+        }
     }
 
     public enum Segment
