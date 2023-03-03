@@ -232,6 +232,8 @@ namespace JackAnalyzer
                 CompileExpression();
                 ProcessCharacterSymbol(";");
             }
+
+            vmWriter.WriteReturn();
             WriteEndElement("returnStatement");
         }
 
