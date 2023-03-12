@@ -96,28 +96,32 @@ namespace JackAnalyzer
             var subroutineName = ProcessSubroutineNameDeclared();
             ProcessCharacterSymbol("(");
             var parameterCount = CompileParameterList();
-            ProcessCharacterSymbol(")");
-
-            vmWriter.WriteFunction($"{className}.{subroutineName}", parameterCount);
+            ProcessCharacterSymbol(")");            
             
             WriteStartElement("subroutineBody");
             ProcessCharacterSymbol("{");
 
+            var localCount = 0;
             while(ct.Keyword == Keyword.Var)
             {
                 WriteStartElement("varDec");
                 Process(); // var keyword
                 var symbolType = ProcessTypename();
-                ProcessSymbolDeclared(SymbolKind.Var, symbolType);                
+                ProcessSymbolDeclared(SymbolKind.Var, symbolType);
+                localCount++;
+
                 while(CurrentTokenIsComma)
                 {
                     Process();
                     ProcessSymbolDeclared(SymbolKind.Var, symbolType);
+                    localCount++;
                 }
 
                 ProcessCharacterSymbol(";");
                 WriteEndElement("varDec");
             }
+
+            vmWriter.WriteFunction($"{className}.{subroutineName}", localCount);
 
             CompileStatements();                       
 
@@ -173,7 +177,8 @@ namespace JackAnalyzer
 
             ProcessCharacterSymbol("=");
             CompileExpression();
-            vmWriter.WritePop(Segment.Local, currentTable.Lookup(identifier).Index);
+            var symbol = currentTable.Lookup(identifier);
+            vmWriter.WritePop(symbol.Segment, symbol.Index);
             ProcessCharacterSymbol(";");
             WriteEndElement("letStatement");
         }
@@ -291,7 +296,8 @@ namespace JackAnalyzer
                         vmWriter.WritePush(Segment.Constant, 0);
                         break;
                     case Keyword.True:
-                        vmWriter.WritePush(Segment.Constant, 1);
+                        vmWriter.WritePush(Segment.Constant, 0);
+                        vmWriter.WriteArithmetic("not");
                         break;
                     default:
                         throw new Exception("Unrecognized keyword constant");
