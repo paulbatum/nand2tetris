@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -83,7 +84,7 @@ namespace JackAnalyzer
             currentTable = subroutineTable;
             WriteStartElement("subroutineDec");
 
-            ProcessOneOf(Keyword.Constructor, Keyword.Function, Keyword.Method);
+            var subroutineType = ProcessOneOf(Keyword.Constructor, Keyword.Function, Keyword.Method);
             if (ct.TokenType == TokenType.Keyword && ct.Keyword == Keyword.Void)
             {
                 Process();
@@ -122,6 +123,21 @@ namespace JackAnalyzer
             }
 
             vmWriter.WriteFunction($"{className}.{subroutineName}", localCount);
+
+            if(subroutineType == Keyword.Constructor)
+            {
+                var fieldCount = classTable.VarCount(SymbolKind.Field);
+                vmWriter.WritePush(Segment.Constant, fieldCount);
+                vmWriter.WriteCall("Memory.alloc", 1);
+                vmWriter.WritePop(Segment.Pointer, 0);
+            }
+            else if (subroutineType == Keyword.Method)
+            {
+                vmWriter.WritePush(Segment.Argument, 0);
+                vmWriter.WritePop(Segment.Pointer, 0);
+            }
+
+
 
             CompileStatements();                       
 
@@ -177,7 +193,7 @@ namespace JackAnalyzer
 
             ProcessCharacterSymbol("=");
             CompileExpression();
-            var symbol = currentTable.Lookup(identifier);
+            var symbol = currentTable.Lookup(identifier) ?? classTable.Lookup(identifier);
             vmWriter.WritePop(symbol.Segment, symbol.Index);
             ProcessCharacterSymbol(";");
             WriteEndElement("letStatement");
@@ -345,6 +361,10 @@ namespace JackAnalyzer
                             ProcessCharacterSymbol("(");
                             var expressionCount = CompileExpressionList();
                             ProcessCharacterSymbol(")");
+
+                            // OK, so this line is wrong when we are calling a method on an object.
+                            // For example do game.run() becomes call game.run which is wrong.
+                            // We need to do the steps on page 226
                             vmWriter.WriteCall($"{i1}.{i2}", expressionCount);
                             break;
                         default:

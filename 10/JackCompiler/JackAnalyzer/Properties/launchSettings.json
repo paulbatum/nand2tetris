@@ -1,9 +1,5 @@
 {
   "profiles": {
-    "JackAnalyzer - Square": {
-      "commandName": "Project",
-      "workingDirectory": "D:\\code\\nand2tetris\\projects\\10\\Square"
-    },
     "Jack Analyzer - Local": {
       "commandName": "Project"
     },
@@ -18,6 +14,10 @@
     "JackCompiler-ConvertToBin": {
       "commandName": "Project",
       "workingDirectory": "D:\\code\\nand2tetris\\projects\\11\\ConvertToBin"
+    },
+    "JackCompiler- Square": {
+      "commandName": "Project",
+      "workingDirectory": "D:\\code\\nand2tetris\\projects\\11\\Square"
     }
   }
 }

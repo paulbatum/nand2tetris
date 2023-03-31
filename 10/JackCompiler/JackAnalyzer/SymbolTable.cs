@@ -40,7 +40,7 @@ namespace JackAnalyzer
             public Segment Segment => this.Kind switch
             {
                 SymbolKind.Static => Segment.Static,
-                SymbolKind.Field => throw new NotImplementedException(),
+                SymbolKind.Field => Segment.This,
                 SymbolKind.Arg => Segment.Argument,
                 SymbolKind.Var => Segment.Local,
             };
