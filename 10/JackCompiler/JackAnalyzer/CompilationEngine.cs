@@ -354,22 +354,35 @@ namespace JackAnalyzer
                             CompileExpression();
                             ProcessCharacterSymbol("]");
                             break;
-                        case ".":
-                            var i1 = ProcessSymbolUsed(identifier, SymbolCategory.Class.ToString());
+                        case ".":                            
+                            var i1= subroutineTable.Lookup(identifier.Value) ?? classTable.Lookup(identifier.Value);
+
+                            if(i1 != null)
+                            {
+                                vmWriter.WritePush(i1.Segment, i1.Index);
+                            }
+
+                            string i1Class = i1 == null ? identifier.Value : i1.Type;
+                            ProcessSymbolUsed(identifier, SymbolCategory.Class.ToString()); // not sure that the category is correct in all cases here
+
                             ProcessCharacterSymbol(".");
-                            var i2 = ProcessSymbolUsed(SymbolCategory.Subroutine.ToString());
+
+
+                            var i2 = ProcessSymbolUsed(SymbolCategory.Subroutine.ToString()); // couldn't this be a method?
                             ProcessCharacterSymbol("(");
                             var expressionCount = CompileExpressionList();
+                            if(i1 != null)
+                            {
+                                // this was a method call
+                                expressionCount++;
+                            }
                             ProcessCharacterSymbol(")");
 
-                            // OK, so this line is wrong when we are calling a method on an object.
-                            // For example do game.run() becomes call game.run which is wrong.
-                            // We need to do the steps on page 226
-                            vmWriter.WriteCall($"{i1}.{i2}", expressionCount);
+                            vmWriter.WriteCall($"{i1Class}.{i2}", expressionCount);
                             break;
                         default:
                             var i3 = ProcessSymbolUsed(identifier);
-                            var symbol = currentTable.Lookup(i3);
+                            var symbol = currentTable.Lookup(i3) ?? classTable.Lookup(i3) ;
                             if (symbol != null)
                             {
                                 vmWriter.WritePush(symbol.Segment, symbol.Index);

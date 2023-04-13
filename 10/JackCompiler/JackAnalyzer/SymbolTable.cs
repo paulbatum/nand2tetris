@@ -28,26 +28,27 @@ namespace JackAnalyzer
 
         public Symbol? Lookup(string name) => symbols.GetValueOrDefault(name);
 
-        public int VarCount(SymbolKind kind) => indexes[kind] - 1;
+        public int VarCount(SymbolKind kind) => indexes[kind];
 
-        public class Symbol
-        {
-            public string Name { get; set; }
-            public string Type { get; set; }
-            public SymbolKind Kind { get; set; }
-            public int Index { get; set; }
-
-            public Segment Segment => this.Kind switch
-            {
-                SymbolKind.Static => Segment.Static,
-                SymbolKind.Field => Segment.This,
-                SymbolKind.Arg => Segment.Argument,
-                SymbolKind.Var => Segment.Local,
-            };
-        }
     }
 
-    
+    public class Symbol
+    {
+        public string Name { get; set; }
+        public string Type { get; set; }
+        public SymbolKind Kind { get; set; }
+        public int Index { get; set; }
+
+        public Segment Segment => this.Kind switch
+        {
+            SymbolKind.Static => Segment.Static,
+            SymbolKind.Field => Segment.This,
+            SymbolKind.Arg => Segment.Argument,
+            SymbolKind.Var => Segment.Local,
+        };
+    }
+
+
 
     public enum SymbolKind
     {
